@@ -13,7 +13,22 @@ public class _Initializer {
             //Init articles table
 //            statement = connection.prepareStatement("DROP TABLE users;");
 ////            statement.executeUpdate();
-            statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS users (id int primary key auto_increment, firstname varchar(100), lastname varchar(100), prof varchar(20), gommette_blanche int, gommette_rouge int, gommette_verte int); ");
+            statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS users (" +
+                    "id int primary key auto_increment, " +
+                    "firstname varchar(100), " +
+                    "lastname varchar(100), " +
+                    "prof varchar(20), " +
+                    "gommette_blanche int, " +
+                    "gommette_rouge int, " +
+                    "gommette_verte int); ");
+            statement.executeUpdate();
+
+            statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS students (" +
+                    "id int primary key auto_increment," +
+                    "firstname varchar(100)," +
+                    "lastname varchar(100)," +
+                    "classe varchar(100)," +
+                    ")");
             statement.executeUpdate();
 
             //Todo Remove me !
