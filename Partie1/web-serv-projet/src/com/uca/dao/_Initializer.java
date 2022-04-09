@@ -26,6 +26,7 @@ public class _Initializer {
 //            statement = connection.prepareStatement("DROP TABLE *;");
 //            statement.executeUpdate();
 
+
             //department = class
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS students (" +
                     "id int primary key auto_increment, " +
@@ -33,6 +34,9 @@ public class _Initializer {
                     "lastname varchar(100), " +
                     "department varchar(100)); ");
             statement.executeUpdate();
+
+//            statement = connection.prepareStatement("DELETE FROM students;");
+//            statement.executeUpdate();
 
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS profs (" +
                     "id int primary key auto_increment," +
@@ -55,7 +59,7 @@ public class _Initializer {
                     "id_student int," +
                     "id_prof int," +
                     "id_gommette int," +
-                    "gommetteDate DATE," +
+                    "gommetteDate varchar(20)," +
                     "foreign key (id_student) references students (id)," +
                     "foreign key (id_prof) references profs (id)," +
                     "foreign key (id_gommette) references gommettes (id));");

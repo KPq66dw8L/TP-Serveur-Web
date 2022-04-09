@@ -1,14 +1,18 @@
 package com.uca;
 
+import com.uca.core.ProfCore;
 import com.uca.dao.StudentDAO;
 import com.uca.dao._Initializer;
+import com.uca.entity.ProfEntity;
 import com.uca.entity.UserEntity;
 import com.uca.gui.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.MultipartConfigElement;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 import static java.lang.Integer.parseInt;
 import static spark.Spark.*;
@@ -28,49 +32,113 @@ public class StartServer {
         * ***
         **/
         //Defining our routes
+
+        /*
+         * Print all students, and more features to logged in profs
+         **/
         get("/users", (req, res) -> {
-            return StudentGUI.getAllUsers();
+
+            /*
+             * From the infos in the cookie, we check if the user exists in our db
+             **/
+            //need authentificate()
+            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
+            ProfEntity currentProf = null;
+            String tmpUsername = new String();
+            String tmpPassword = new String();
+            String[] parts;
+            try {
+                parts = req.cookie("user").split("----");
+                tmpUsername = parts[0];
+                tmpPassword = parts[1];
+            } catch (Exception e){
+            }
+            for (ProfEntity prof : profs){
+                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
+                    currentProf = prof;
+                    break;
+                }
+            }
+            /*
+             * If the user exists in our db and the cookie is written, then he is logged-in and can see the students(everyone can) + add gommettes etc
+             * Else he can only see the list of students
+             **/
+            if (currentProf != null){
+                return StudentGUI.getAllUsers(true);
+            } else {
+                return StudentGUI.getAllUsers(false);
+            }
         });
 
-        get("/usersTest", (req, res) -> {
-            return StudentGUI.getAllUsers(req);
-        });
-
+        /*
+         * List all profs
+         **/
         get("/register", (req, res) -> {
             return ProfGUI.getAllUsers();
         });
 
+        /*
+         * Print the login page
+         **/
         get("/login", (req, res) -> {
             return ProfGUI.loginPage();
         });
 
-
         /*
-         * ***
-         * L'URL ressemblera a: localhost:8081/users/add?firstname=&lastname=&prof=&blanche=&rouge=&verte=
-         * ***
+         * Handle post request from 1st form to add a student
+         * WIP: handle post request from 2nd form to add a gommette to a student
          **/
-//        get("/users/add", (req, res) -> {
-//
-//            res.redirect("/users");
-//            return UserGUI.create(req.queryParams("firstname"), req.queryParams("lastname"), req.queryParams("prof"), req.queryParams("blanche"), req.queryParams("rouge"), req.queryParams("verte"));
-//        });
-
-
         post("/users", (req, res) -> {
+            System.out.println("CHECK");
 
-            String firstname, lastname, group;
+            String firstname, lastname, group, gommette, description, studentID, tmpUsername = null, tmpPassword = null;
             req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
 
-            // on recup les infos du formulaire
+
+            // on recup les infos du 1er formulaire
             firstname = req.queryParams("firstname");
             lastname = req.queryParams("lastname");
             group = req.queryParams("group");
 
+            // on recup les infos du 2eme formulaire
+            gommette = req.queryParams("gommette");
+            description = req.queryParams("description");
+            studentID = req.queryParams("studentName");
+            System.out.println(gommette + " " + description + " " + studentID);
+
+            //need authentificate()
+            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
+            ProfEntity currentProf = null;
+            String[] parts;
+            try {
+                parts = req.cookie("user").split("----");
+                tmpUsername = parts[0];
+                tmpPassword = parts[1];
+            } catch (Exception e){
+            }
+            for (ProfEntity prof : profs){
+                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
+                    currentProf = prof;
+                    break;
+                }
+            }
+
             res.redirect("/users");
-            return StudentGUI.create(firstname, lastname, group);
+
+            // en fonction du formulaire remplit, on appelle la bonne fonction
+            if (firstname != null && lastname != null && group != null){
+                return StudentGUI.create(firstname, lastname, group);
+            } else if (gommette != null && description != null && studentID != null){
+                System.out.println("Router ACTION !!");
+                return StudentGUI.addGommette(gommette, description, studentID, currentProf.getId());
+            } else {
+                return null;
+            }
         });
 
+        /*
+         * Call create() to handle registration from form
+         **/
         post("/register", (req, res) -> {
 
             String firstname, lastname, username, newPassword;
@@ -85,6 +153,9 @@ public class StartServer {
             return ProfGUI.create(firstname, lastname, username, newPassword);
         });
 
+        /*
+         * Call login(), also passes 'response' to be able to write a cookie
+         **/
         post("/login", (req, res) -> {
 
             String firstname, lastname, username, newPassword;
@@ -93,13 +164,12 @@ public class StartServer {
             username = req.queryParams("username");
             newPassword = req.queryParams("password");
 
-            return ProfGUI.login(username, newPassword, res); //route ?
+            return ProfGUI.login(username, newPassword, res);
         });
 
         /*
-         * ***
+         * OUTDATED
          * L'URL ressemblera a: localhost:8081/users/delete?firstname=julien&lastname=herbaux
-         * ***
          **/
         delete("/users/delete", (req, res) -> {
             String firstname = req.queryParams("firstname");

@@ -4,22 +4,36 @@
 
 <ul>
     <#list users as user>
-        <li>${user.id} - ${user.firstName} ${user.lastName} in ${user.group} </li>
-        <#if x == 1>
-            <button>Add gommette</button>
-        <#else>
-            x is not 1
+
+        <li>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}, Gommettes: blanches:${user.getNb_white()}, vertes: ${user.getNb_green()}, rouges: ${user.getNb_red()} </li>
+
+        <#if logged == true>
+            <button>Delete student</button>
+            <form method='post' enctype='multipart/form-data'>
+                <p>Choose color:</p>
+                <select name="gommette" id="gommette">
+                    <option value="white">White</option>
+                    <option value="green">Green</option>
+                    <option value="red">Red</option>
+                </select>
+                <input type="text" name="description">
+                <input type="hidden" value='${user.id}' name="studentName">
+                <button type="submit" name="add-gommette">Add gommette</button>
+            </form>
         </#if>
+
     </#list>
 </ul>
 
-<form method='post' enctype='multipart/form-data'>
-  <input type='text' name='firstname' >
-  <input type='text' name='lastname' >
-  <input type='text' name='group' >
+        <#if logged == true>
+            <form method='post' enctype='multipart/form-data'>
+              <input type='text' name='firstname' >
+              <input type='text' name='lastname' >
+              <input type='text' name='group' >
 
-  <button>Add student</button>
-</form>
+              <button type="submit" name="add-student">Add student</button>
+            </form>
+        </#if>
 
 
 </body>

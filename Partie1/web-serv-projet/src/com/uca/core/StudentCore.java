@@ -1,6 +1,8 @@
 package com.uca.core;
 
 import com.uca.dao.StudentDAO;
+import com.uca.entity.GivenGommettes;
+import com.uca.entity.Gommette;
 import com.uca.entity.StudentEntity;
 import com.uca.entity.UserEntity;
 
@@ -24,5 +26,10 @@ public class StudentCore {
 
     public static void delete(StudentEntity obj) throws SQLException {
         new StudentDAO().delete(obj);
+    }
+
+    public static void addGommette(GivenGommettes donneLeGommette){
+        System.out.println("addGommette dans StudentCore Action");
+        new StudentDAO().addGommette(donneLeGommette);
     }
 }
