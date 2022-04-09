@@ -24,6 +24,4 @@ public class _Connector {
         }
         return connect;
     }
-
-
 }

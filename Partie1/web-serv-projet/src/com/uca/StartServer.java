@@ -1,6 +1,6 @@
 package com.uca;
 
-import com.uca.dao.UserDAO;
+import com.uca.dao.StudentDAO;
 import com.uca.dao._Initializer;
 import com.uca.entity.UserEntity;
 import com.uca.gui.*;
@@ -29,7 +29,19 @@ public class StartServer {
         **/
         //Defining our routes
         get("/users", (req, res) -> {
-            return UserGUI.getAllUsers();
+            return StudentGUI.getAllUsers();
+        });
+
+        get("/usersTest", (req, res) -> {
+            return StudentGUI.getAllUsers(req);
+        });
+
+        get("/register", (req, res) -> {
+            return ProfGUI.getAllUsers();
+        });
+
+        get("/login", (req, res) -> {
+            return ProfGUI.loginPage();
         });
 
 
@@ -44,33 +56,44 @@ public class StartServer {
 //            return UserGUI.create(req.queryParams("firstname"), req.queryParams("lastname"), req.queryParams("prof"), req.queryParams("blanche"), req.queryParams("rouge"), req.queryParams("verte"));
 //        });
 
-        /*
-         * ***
-         * Pourquoi:
-         * curl -X POST -F 'firstname=test' -F 'lastname=julien' -F 'prof=Mireille' -F 'blanche=0' -F 'rouge=0' -F 'verte=0' http://localhost:8081/users
-         * Ne marche pas?
-         * ***
-         **/
+
         post("/users", (req, res) -> {
 
-            String firstname = new String(), lastname = new String(), prof = new String(), blanche = new String(), rouge = new String(), verte =new String();
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet
+            String firstname, lastname, group;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
 
-            /*
-             * ***
-             * Mettre dans ds try ou qq chosae comme ca:
-             * ***
-             **/
+            // on recup les infos du formulaire
             firstname = req.queryParams("firstname");
             lastname = req.queryParams("lastname");
-            prof = req.queryParams("prof");
-            blanche = req.queryParams("blanche");
-            rouge = req.queryParams("rouge");
-            verte = req.queryParams("verte");
-
+            group = req.queryParams("group");
 
             res.redirect("/users");
-            return UserGUI.create(firstname, lastname, prof, blanche, rouge, verte);
+            return StudentGUI.create(firstname, lastname, group);
+        });
+
+        post("/register", (req, res) -> {
+
+            String firstname, lastname, username, newPassword;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+
+            // try?
+            firstname = req.queryParams("firstname");
+            lastname = req.queryParams("lastname");
+            username = req.queryParams("username");
+            newPassword = req.queryParams("password");
+
+            return ProfGUI.create(firstname, lastname, username, newPassword);
+        });
+
+        post("/login", (req, res) -> {
+
+            String firstname, lastname, username, newPassword;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+
+            username = req.queryParams("username");
+            newPassword = req.queryParams("password");
+
+            return ProfGUI.login(username, newPassword, res); //route ?
         });
 
         /*
@@ -78,10 +101,11 @@ public class StartServer {
          * L'URL ressemblera a: localhost:8081/users/delete?firstname=julien&lastname=herbaux
          * ***
          **/
-        get("/users/delete", (req, res) -> {
+        delete("/users/delete", (req, res) -> {
+            String firstname = req.queryParams("firstname");
+            String lastname = req.queryParams("lastname");
 
-            res.redirect("/users");
-            return UserGUI.delete(req.queryParams("firstname"), req.queryParams("lastname"));
+            return StudentGUI.delete(firstname, lastname);
         });
     }
 }

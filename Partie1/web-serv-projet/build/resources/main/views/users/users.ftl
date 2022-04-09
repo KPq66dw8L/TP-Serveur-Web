@@ -4,20 +4,23 @@
 
 <ul>
     <#list users as user>
-        <li>${user.id} - ${user.firstName} ${user.lastName}</li>
+        <li>${user.id} - ${user.firstName} ${user.lastName} in ${user.group} </li>
+        <#if x == 1>
+            <button>Add gommette</button>
+        <#else>
+            x is not 1
+        </#if>
     </#list>
 </ul>
 
 <form method='post' enctype='multipart/form-data'>
   <input type='text' name='firstname' >
   <input type='text' name='lastname' >
-  <input type='text' name='prof' >
-  <input type='text' name='blanche' >
-  <input type='text' name='rouge' >
-  <input type='text' name='verte' >
+  <input type='text' name='group' >
 
-  <button>Upload picture</button>
+  <button>Add student</button>
 </form>
+
 
 </body>
 

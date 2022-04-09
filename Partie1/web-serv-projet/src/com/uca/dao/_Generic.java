@@ -20,5 +20,4 @@ public abstract class _Generic<T> {
      */
     public abstract void delete(T obj) throws SQLException;
 
-    public abstract void delete(String firstname, String lastname) throws SQLException;
 }
