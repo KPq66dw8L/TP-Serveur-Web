@@ -23,10 +23,11 @@ public class _Initializer {
 //                    "gommette_verte int); ");
 //            statement.executeUpdate();
 
-//            statement = connection.prepareStatement("DROP TABLE *;");
-//            statement.executeUpdate();
+            statement = connection.prepareStatement("DROP TABLE givenGommettes;");
+            statement.executeUpdate();
 
-
+            statement = connection.prepareStatement("DROP TABLE students;");
+            statement.executeUpdate();
             //department = class
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS students (" +
                     "id int primary key auto_increment, " +
@@ -35,9 +36,18 @@ public class _Initializer {
                     "department varchar(100)); ");
             statement.executeUpdate();
 
-//            statement = connection.prepareStatement("DELETE FROM students;");
+//            statement = connection.prepareStatement("DELETE FROM givenGommettes cascade;");
+//            statement.executeUpdate();
+//            statement = connection.prepareStatement("DELETE FROM students cascade;");
+//            statement.executeUpdate();
+//            statement = connection.prepareStatement("DELETE FROM gommettes cascade;");
 //            statement.executeUpdate();
 
+//            statement = connection.prepareStatement("DELETE FROM profs cascade;");
+//            statement.executeUpdate();
+
+            statement = connection.prepareStatement("DROP TABLE profs;");
+            statement.executeUpdate();
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS profs (" +
                     "id int primary key auto_increment," +
                     "firstname varchar(100)," +
@@ -47,6 +57,8 @@ public class _Initializer {
                     "hashedPassword varchar(100));");
             statement.executeUpdate();
 
+            statement = connection.prepareStatement("DROP TABLE gommettes;");
+            statement.executeUpdate();
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS gommettes (" +
                     "id int primary key auto_increment," +
                     "colour varchar(100)," +
@@ -64,6 +76,16 @@ public class _Initializer {
                     "foreign key (id_prof) references profs (id)," +
                     "foreign key (id_gommette) references gommettes (id));");
             statement.executeUpdate();
+
+//            statement = connection.prepareStatement("ALTER TABLE students AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
+//            statement = connection.prepareStatement("ALTER TABLE gommettes AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
+//            statement = connection.prepareStatement("ALTER TABLE givenGommettes AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
+
+//            statement = connection.prepareStatement("ALTER TABLE profs AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
 
 
         } catch (Exception e){

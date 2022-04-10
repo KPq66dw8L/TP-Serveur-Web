@@ -5,12 +5,12 @@
 <ul>
     <#list users as user>
 
-        <li>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}, Gommettes: blanches:${user.getNb_white()}, vertes: ${user.getNb_green()}, rouges: ${user.getNb_red()} </li>
+        <li>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}, Gommettes: ${user.getNb_white()}, ${user.getNb_green()}, ${user.getNb_red()} </li>
 
         <#if logged == true>
             <button>Delete student</button>
             <form method='post' enctype='multipart/form-data'>
-                <p>Choose color:</p>
+
                 <select name="gommette" id="gommette">
                     <option value="white">White</option>
                     <option value="green">Green</option>

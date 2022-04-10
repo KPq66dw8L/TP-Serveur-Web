@@ -43,12 +43,19 @@ public class StudentGUI {
         Map<String, Object> input = new HashMap<>();
 
         input.put("users", StudentCore.getAllUsers());
+        input.put("logged", logged);
+
+        try {
+            for (StudentEntity stu : StudentCore.getAllUsers()){
+                System.out.println(stu.getFirstName() + " & " + stu.getNb_white());
+            }
+        } catch (Exception e){
+            System.out.println("fuckkkkkkkkkkkkkkkkk");
+        }
 
 //        for (StudentEntity stu : StudentCore.getAllUsers()){
 //            System.out.println(stu.getFirstName());
 //        }
-
-        input.put("logged", logged);
 
         Writer output = new StringWriter();
         try {

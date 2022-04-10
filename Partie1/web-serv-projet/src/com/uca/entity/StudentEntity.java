@@ -3,7 +3,7 @@ package com.uca.entity;
 import java.util.ArrayList;
 
 public class StudentEntity extends UserEntity {
-    public static ArrayList<GivenGommettes> everyGommettes;
+    public static ArrayList<GivenGommettes> everyGommettes = new ArrayList<>();
 //    private int id;
 //    private String firstname;
 //    private String lastname;
@@ -18,7 +18,7 @@ public class StudentEntity extends UserEntity {
     }
 
     private String group;
-    public ArrayList<GivenGommettes> gommettes;
+    public ArrayList<GivenGommettes> gommettes = new ArrayList<>();
 
 //    public ArrayList<GivenGommettes> getGommettes() {
 //        return gommettes;
@@ -33,14 +33,29 @@ public class StudentEntity extends UserEntity {
     }
 
     public void addGommete(GivenGommettes gom){
-        if (gom.getGommette().getColour() == "white"){
+
+        if (gom.getGommette().getColour().equals("white")){
+            System.out.println("white added in entity 1");
             this.nb_white++;
-        } else if (gom.getGommette().getColour() == "green"){
+            System.out.println("white added in entity 2");
+            //try-catch because gommettes was not initialized...
+            try {
+                gommettes.add(gom);
+            } catch (Exception e){
+                System.out.println(e);
+            }
+            System.out.println("white added in entity 3");
+        } else if (gom.getGommette().getColour().equals("green")){
             this.nb_green++;
-        } else {
+            gommettes.add(gom);
+        } else if (gom.getGommette().getColour().equals("red")){
             this.nb_red++;
+            gommettes.add(gom);
+        } else {
+            System.out.println("Gommette colour invalid.");
         }
-        gommettes.add(gom);
+
+        System.out.println("gommette added in entity");
     }
 
     public String getNb_white() {
@@ -48,6 +63,7 @@ public class StudentEntity extends UserEntity {
     }
 
     public void setNb_white(int nb_white) {
+        System.out.println("Boonnnnn: " + nb_white);
         this.nb_white = nb_white;
     }
 

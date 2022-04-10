@@ -31,6 +31,8 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 entity.setLastName(resultSet.getString("lastname"));
                 entity.setGroup(resultSet.getString("department"));
 
+                System.out.println("getAllUser DAO 1: " + entity.getFirstName());
+
                 entities.add(entity);
             }
             preparedStatement = this.connect.prepareStatement("SELECT * FROM gommettes ORDER BY id ASC;");
@@ -40,6 +42,8 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 entityGommette.setId(resultSet.getInt("id"));
                 entityGommette.setColour(resultSet.getString("colour"));
                 entityGommette.setDescription(resultSet.getString("description"));
+
+                System.out.println("getAllUser DAO 2: " + entityGommette.getColour());
 
                 goms.add(entityGommette);
             }
@@ -53,16 +57,25 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 entityGivenGommettes.setId_prof(resultSet.getInt("id_prof"));
                 id_gommette_buffer = resultSet.getInt("id_gommette");
                 entityGivenGommettes.setDate(resultSet.getString("gommetteDate"));
+                System.out.println("getAllUser DAO 3.1: " + resultSet.getInt("id"));
+                System.out.println("getAllUser DAO 3.2: " + resultSet.getInt("id_student"));
+                System.out.println("getAllUser DAO 3.3: " + resultSet.getInt("id_prof"));
+                System.out.println("getAllUser DAO 3.4: " + id_gommette_buffer);
+                System.out.println("getAllUser DAO 3.5: " + resultSet.getString("gommetteDate"));
 
                 for (Gommette tmpGom : goms){
                     if (tmpGom.getId() == id_gommette_buffer){
                         entityGivenGommettes.setGommette(tmpGom);
+                        System.out.println("getAllUser DAO CHECK 1");
                     }
                 }
 
                 for (StudentEntity tmpStudent : entities){
+                    System.out.println("getAllUser DAO CHECK ULTIME: " + entityGivenGommettes.getId_student() + " & " + tmpStudent.getId());
+                    System.out.println(entityGivenGommettes.getId_student() == tmpStudent.getId());
                     if (entityGivenGommettes.getId_student() == tmpStudent.getId()){
                         tmpStudent.addGommete(entityGivenGommettes);
+                        System.out.println("getAllUser DAO CHECK 2");
                     }
                 }
 
@@ -107,12 +120,28 @@ public class StudentDAO extends _Generic<StudentEntity> {
             statement.setString(2, addedGommette.getGommette().getDescription());
             statement.executeUpdate();
 
-            statement = this.connect.prepareStatement("SELECT * FROM gommettes ORDER BY ID DESC LIMIT 1;");
+            //            statement = this.connect.prepareStatement("SELECT MAX(id) FROM gommettes;");
+            statement = this.connect.prepareStatement("SELECT * FROM gommettes WHERE id=(SELECT MAX(id) FROM gommettes);");
             ResultSet resultSet = statement.executeQuery();
-            System.out.println(resultSet.getInt("id"));
-            int id_gommette = resultSet.getInt("id");
+            int id_gommette = 0;
+
+            while (resultSet.next()){
+                try {
+//            System.out.println("Oeeeeee" + resultSet.getInt(1));
+//            System.out.println("ID=====: " + resultSet.getInt("id"));
+                    id_gommette = resultSet.getInt("id");
+                    System.out.println("id gommette: " + id_gommette);
+                } catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
 
             statement = this.connect.prepareStatement("INSERT INTO givenGommettes(id_student, id_prof, id_gommette, gommetteDate) VALUES(?, ?, ?, ?);");
+            System.out.println("addGommete DAO 1: " + addedGommette.getId_student());
+            System.out.println("addGommete DAO 2: " + addedGommette.getId_prof());
+            System.out.println("addGommete DAO 3: " + id_gommette);
+            System.out.println("addGommete DAO 4: " + addedGommette.getDate());
+
             statement.setInt(1, addedGommette.getId_student());
             statement.setInt(2, addedGommette.getId_prof());
             statement.setInt(3, id_gommette);
@@ -121,7 +150,7 @@ public class StudentDAO extends _Generic<StudentEntity> {
             System.out.println("addGommette dans StudentDAO ACTION !!");
             //return obj;
         } catch (SQLException e){
-            //e.printStackTrace();
+            e.printStackTrace();
             System.out.println("Raté");
         }
         //return null;
