@@ -45,19 +45,11 @@ public class StudentGUI {
         input.put("users", StudentCore.getAllUsers());
         input.put("logged", logged);
 
-        try {
-            for (StudentEntity stu : StudentCore.getAllUsers()){
-                System.out.println(stu.getFirstName() + " & " + stu.getNb_white());
-            }
-        } catch (Exception e){
-            System.out.println("fuckkkkkkkkkkkkkkkkk");
-        }
-
-//        for (StudentEntity stu : StudentCore.getAllUsers()){
-//            System.out.println(stu.getFirstName());
-//        }
 
         Writer output = new StringWriter();
+        /*
+         * In try-catch, else an error in template gives a 505 error and no traceback
+         **/
         try {
             Template template = configuration.getTemplate("users/users.ftl");
             template.setOutputEncoding("UTF-8");
@@ -65,12 +57,12 @@ public class StudentGUI {
         } catch (Exception e){
 //            System.out.println(e);
         }
-        System.out.println("getAllUser ACTION !!");
+//        System.out.println("getAllUser ACTION !!");
         return output.toString();
     }
 
     /*
-     * Handle creation of a new student entity
+     * Handle creation of a new student entity in Java
      **/
     public static StudentEntity create(String firstname, String lastname, String group) throws SQLException, IOException, TemplateException {
 
@@ -96,6 +88,10 @@ public class StudentGUI {
         return StudentGUI.getAllUsers(false);
     }
 
+    /*
+     * Handle the creation of a new Gommette + a new GivenGommette. Also call the necessary function to create everything in the db.
+     * Return the list of students updated, with the logged-in parameter as one already need to be logged to be able to manipulate gommettes.
+     **/
     public static Object addGommette(String gommette, String description, String studentID, int id_prof) throws TemplateException, IOException {
         Gommette newGommette = new Gommette();
         newGommette.setColour(gommette);
@@ -106,7 +102,7 @@ public class StudentGUI {
         donneLaGommette.setId_student(id_student);
 
         donneLaGommette.setGommette(newGommette);
-        System.out.println("addGommette dans StudentGUI ACTION !!");
+//        System.out.println("addGommette dans StudentGUI ACTION !!");
 
         Date date = new Date();
         donneLaGommette.setDate(date);

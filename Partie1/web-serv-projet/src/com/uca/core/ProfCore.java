@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /*
  * ***
- * Model
+ * Model(s)
  * ***
  **/
 public class ProfCore {

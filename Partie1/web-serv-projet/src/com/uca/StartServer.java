@@ -60,7 +60,7 @@ public class StartServer {
                 }
             }
             /*
-             * If the user exists in our db and the cookie is written, then he is logged-in and can see the students(everyone can) + add gommettes etc
+             * If the user exists in our db and the cookie is written, then he is logged-in and he can see the students(everyone can) + add gommettes etc
              * Else he can only see the list of students
              **/
             if (currentProf != null){
@@ -85,8 +85,7 @@ public class StartServer {
         });
 
         /*
-         * Handle post request from 1st form to add a student
-         * WIP: handle post request from 2nd form to add a gommette to a student
+         * Handle post request from 1st form to add a student & 2nd form to add a gommette
          **/
         post("/users", (req, res) -> {
             System.out.println("CHECK");

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /*
  * ***
- * Model
+ * Model(s)
  * ***
  **/
 public class StudentCore {
@@ -29,7 +29,7 @@ public class StudentCore {
     }
 
     public static void addGommette(GivenGommettes donneLeGommette){
-        System.out.println("addGommette dans StudentCore Action");
+//        System.out.println("addGommette dans StudentCore Action");
         new StudentDAO().addGommette(donneLeGommette);
     }
 }

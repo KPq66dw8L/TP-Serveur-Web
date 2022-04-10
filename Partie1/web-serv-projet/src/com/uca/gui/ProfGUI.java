@@ -45,7 +45,7 @@ public class ProfGUI {
     }
 
     /*
-     * Handle part of the registration of a prof = create a new prof entity, and print list of profs afterwards
+     * Handle part of the registration of a prof = create a new prof entity, and return the list of profs afterwards
      **/
     public static String create(String firstname, String lastname, String username, String newPassword) throws SQLException, IOException, TemplateException {
 

@@ -15,6 +15,9 @@ import java.util.ArrayList;
  **/
 public class ProfDAO extends _Generic<ProfEntity> {
 
+    /*
+     * Retrieve the list of all profs from the db.
+     **/
     public ArrayList<ProfEntity> getAllUsers() {
         ArrayList<ProfEntity> entities = new ArrayList<>();
         try {
@@ -40,6 +43,9 @@ public class ProfDAO extends _Generic<ProfEntity> {
         return entities;
     }
 
+    /*
+     * Create a new prof in the db.
+     **/
     @Override
     public ProfEntity create(ProfEntity obj) throws SQLException {
         //TODO !

@@ -10,24 +10,11 @@ public class _Initializer {
         try {
             PreparedStatement statement;
 
-            //Init articles table
-//            statement = connection.prepareStatement("DROP TABLE users;");
+//            statement = connection.prepareStatement("DROP TABLE givenGommettes;");
 //            statement.executeUpdate();
-//            statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS users (" +
-//                    "id int primary key auto_increment, " +
-//                    "firstname varchar(100), " +
-//                    "lastname varchar(100), " +
-//                    "prof varchar(20), " +
-//                    "gommette_blanche int, " +
-//                    "gommette_rouge int, " +
-//                    "gommette_verte int); ");
+//
+//            statement = connection.prepareStatement("DROP TABLE students;");
 //            statement.executeUpdate();
-
-            statement = connection.prepareStatement("DROP TABLE givenGommettes;");
-            statement.executeUpdate();
-
-            statement = connection.prepareStatement("DROP TABLE students;");
-            statement.executeUpdate();
             //department = class
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS students (" +
                     "id int primary key auto_increment, " +
@@ -46,8 +33,8 @@ public class _Initializer {
 //            statement = connection.prepareStatement("DELETE FROM profs cascade;");
 //            statement.executeUpdate();
 
-            statement = connection.prepareStatement("DROP TABLE profs;");
-            statement.executeUpdate();
+//            statement = connection.prepareStatement("DROP TABLE profs;");
+//            statement.executeUpdate();
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS profs (" +
                     "id int primary key auto_increment," +
                     "firstname varchar(100)," +
@@ -57,8 +44,8 @@ public class _Initializer {
                     "hashedPassword varchar(100));");
             statement.executeUpdate();
 
-            statement = connection.prepareStatement("DROP TABLE gommettes;");
-            statement.executeUpdate();
+//            statement = connection.prepareStatement("DROP TABLE gommettes;");
+//            statement.executeUpdate();
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS gommettes (" +
                     "id int primary key auto_increment," +
                     "colour varchar(100)," +
