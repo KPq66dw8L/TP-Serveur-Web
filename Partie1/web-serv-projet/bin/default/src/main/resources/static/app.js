@@ -1,6 +1,6 @@
 class DeleteHTTP {
   
-    // Make an HTTP PUT Request
+    // Make an HTTP DELETE Request
     async delete(url) {
   
         // Awaiting fetch which contains 
@@ -20,19 +20,31 @@ class DeleteHTTP {
     }
 }
 
-// Instantiating new EasyHTTP class
+// Instantiating new DeleteHTTP class
 const http = new DeleteHTTP;
   
 // Update Post
 document.body.onload = async () => {
 
-    let button = document.getElementById('delete-student');
+    const buttons = document.querySelectorAll('#delete-student');
 
-    http.delete('https://users/:id/delete')
-  
-    // Resolving promise for response data
-    .then(data => console.log(data))
+    buttons.forEach(button => { 
+        button.addEventListener('click', function handleClick(e) {
+            e.preventDefault(); // to avoid problems related to Cross-Origin Resource Sharing (CORS)
     
-    // Resolving promise for error
-    .catch(err => console.log(err));
+            console.log('delete student button clicked');
+    
+            let link = button.getAttribute('data-student-id');
+    
+            http.delete(link)
+      
+            // Resolving promise for response data
+            .then(data => console.log(data))
+
+            .then(() => { location.reload(); })
+            
+            // Resolving promise for error
+            .catch(err => console.log(err));
+        });
+    });
 }

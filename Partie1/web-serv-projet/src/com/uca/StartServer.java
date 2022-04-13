@@ -71,6 +71,15 @@ public class StartServer {
         });
 
         /*
+         * Get a precise student page, listing its gommettes with their description
+         **/
+        get("/users/:id", (req, res) -> {
+            String id = req.params(":id");
+
+            return StudentGUI.getUser(id);
+        });
+
+        /*
          * List all profs
          **/
         get("/register", (req, res) -> {
@@ -166,7 +175,6 @@ public class StartServer {
         });
 
         /*
-         * WIP
          * .queryParam -> localhost:8081/users/delete?firstname=julien&lastname=herbaux
          * .params -> /users/:id/delete
          **/

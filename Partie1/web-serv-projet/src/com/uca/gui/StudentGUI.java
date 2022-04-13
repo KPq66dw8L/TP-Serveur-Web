@@ -48,7 +48,7 @@ public class StudentGUI {
 
         Writer output = new StringWriter();
         /*
-         * In try-catch, else an error in template gives a 505 error and no traceback
+         * try-catch, otherwise an error in template gives a 505 error and no traceback
          **/
         try {
             Template template = configuration.getTemplate("users/users.ftl");
@@ -58,6 +58,65 @@ public class StudentGUI {
 //            System.out.println(e);
         }
 //        System.out.println("getAllUser ACTION !!");
+        return output.toString();
+    }
+
+    public static String getUser(String idStudent) throws IOException, TemplateException {
+
+        // TODO : try catch : if the id does not correspond to any student
+        Configuration configuration = _FreeMarkerInitializer.getContext();
+
+        Map<String, Object> input = new HashMap<>();
+
+        StudentEntity student = null;
+
+        for (StudentEntity stu : StudentCore.getAllUsers()) {
+            if (stu.getId() == Integer.parseInt(idStudent)) {
+                student = stu;
+            }
+        }
+
+        input.put("user", student);
+
+//        ArrayList<Gommette> gommettes_white = new ArrayList<>(), gommettes_green = new ArrayList<>(), gommettes_red = new ArrayList<>();
+//        for (GivenGommettes givenGom : student.gommettes) {
+//            if (givenGom.getGommette().getColour().equals("white")){
+//                gommettes_white.add(givenGom.getGommette());
+//            } else if (givenGom.getGommette().getColour().equals("green")){
+//                gommettes_green.add(givenGom.getGommette());
+//            } else {
+//                gommettes_red.add(givenGom.getGommette());
+//            }
+//        }
+//
+//        input.put("gommetteWhite", gommettes_white);
+//        input.put("gommetteGreen", gommettes_green);
+//        input.put("gommetteRed", gommettes_red);
+
+        ArrayList<GivenGommettes> gommettes_white = new ArrayList<>(), gommettes_green = new ArrayList<>(), gommettes_red = new ArrayList<>();
+        for (GivenGommettes givenGom : student.gommettes) {
+            if (givenGom.getGommette().getColour().equals("white")){
+                gommettes_white.add(givenGom);
+            } else if (givenGom.getGommette().getColour().equals("green")){
+                gommettes_green.add(givenGom);
+            } else {
+                gommettes_red.add(givenGom);
+            }
+        }
+
+        input.put("gommetteWhite", gommettes_white);
+        input.put("gommetteGreen", gommettes_green);
+        input.put("gommetteRed", gommettes_red);
+
+        Writer output = new StringWriter();
+
+        try {
+            Template template = configuration.getTemplate("users/student.ftl");
+            template.setOutputEncoding("UTF-8");
+            template.process(input, output);
+        } catch (Exception e){
+//            System.out.println(e);
+        }
         return output.toString();
     }
 
@@ -77,14 +136,11 @@ public class StudentGUI {
         return newUser;
     }
 
-    /*
-     * WIP
-     **/
     public static String delete(String idStudent) throws SQLException, TemplateException, IOException {
 
         int id = Integer.parseInt(idStudent);
 
-        // everything before StudentCore.delete is used to get the student to delete's gommettes, to be able to delete them from the db
+        // everything before StudentCore.delete is used to get the gommettes of the student-to-delete, to be able to delete them from the db
         ArrayList<StudentEntity> students = StudentCore.getAllUsers();
 
         StudentEntity stu_to_del = new StudentEntity();
@@ -119,7 +175,6 @@ public class StudentGUI {
         donneLaGommette.setId_student(id_student);
 
         donneLaGommette.setGommette(newGommette);
-//        System.out.println("addGommette dans StudentGUI ACTION !!");
 
         Date date = new Date();
         donneLaGommette.setDate(date);
