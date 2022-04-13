@@ -24,8 +24,8 @@ public class StudentCore {
         return new StudentDAO().create(obj);
     }
 
-    public static void delete(StudentEntity obj) throws SQLException {
-        new StudentDAO().delete(obj);
+    public static void delete(int idStudent, ArrayList<Integer> gommettes_id) throws SQLException {
+        new StudentDAO().delete(idStudent, gommettes_id);
     }
 
     public static void addGommette(GivenGommettes donneLeGommette){

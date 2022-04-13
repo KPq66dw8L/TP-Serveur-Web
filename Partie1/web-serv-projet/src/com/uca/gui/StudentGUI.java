@@ -78,14 +78,31 @@ public class StudentGUI {
     }
 
     /*
-     * OUTDATED
+     * WIP
      **/
-    public static String delete(String firstname, String lastname) throws SQLException, TemplateException, IOException {
+    public static String delete(String idStudent) throws SQLException, TemplateException, IOException {
 
-        StudentEntity obj = new StudentEntity();
+        int id = Integer.parseInt(idStudent);
 
-        StudentCore.delete(obj);
-        return StudentGUI.getAllUsers(false);
+        // everything before StudentCore.delete is used to get the student to delete's gommettes, to be able to delete them from the db
+        ArrayList<StudentEntity> students = StudentCore.getAllUsers();
+
+        StudentEntity stu_to_del = new StudentEntity();
+
+        for (StudentEntity student : students) {
+            if (id == student.getId()){
+                stu_to_del = student;
+            }
+        }
+
+        ArrayList<Integer> gommettes_id = new ArrayList<>();
+
+        for (int i = 0 ; i < stu_to_del.gommettes.size() ; i++){
+            gommettes_id.add(stu_to_del.gommettes.get(i).getId());
+        }
+
+        StudentCore.delete(id, gommettes_id);
+        return StudentGUI.getAllUsers(true);
     }
 
     /*

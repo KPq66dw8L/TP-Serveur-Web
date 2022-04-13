@@ -25,7 +25,8 @@ public class ProfCore {
         return new ProfDAO().create(obj);
     }
 
+//    TODO
     public static void delete(ProfEntity obj) throws SQLException {
-        new ProfDAO().delete(obj);
+        new ProfDAO().delete(0, null);
     }
 }

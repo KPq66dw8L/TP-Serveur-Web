@@ -2,6 +2,7 @@ package com.uca.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public abstract class _Generic<T> {
 
@@ -16,8 +17,9 @@ public abstract class _Generic<T> {
 
     /**
      * Permet la suppression d'une entrée de la base
-     * @param obj
+     * @param id
+     * @param gommettes_id
      */
-    public abstract void delete(T obj) throws SQLException;
+    public abstract void delete(int id, ArrayList<Integer> gommettes_id) throws SQLException;
 
 }

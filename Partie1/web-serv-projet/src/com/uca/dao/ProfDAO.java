@@ -67,7 +67,7 @@ public class ProfDAO extends _Generic<ProfEntity> {
     }
 
     @Override
-    public void delete(ProfEntity obj) throws SQLException {
+    public void delete(int id, ArrayList<Integer> gommettes_id) throws SQLException {
 
     }
 

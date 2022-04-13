@@ -4,9 +4,7 @@ import java.util.ArrayList;
 
 public class StudentEntity extends UserEntity {
     public static ArrayList<GivenGommettes> everyGommettes = new ArrayList<>();
-//    private int id;
-//    private String firstname;
-//    private String lastname;
+
     private int nb_white;
     private int nb_green;
     private int nb_red;
@@ -35,16 +33,16 @@ public class StudentEntity extends UserEntity {
     public void addGommete(GivenGommettes gom){
 
         if (gom.getGommette().getColour().equals("white")){
-            System.out.println("white added in entity 1");
+//            System.out.println("white added in entity 1");
             this.nb_white++;
-            System.out.println("white added in entity 2");
+//            System.out.println("white added in entity 2");
             //try-catch because gommettes was not initialized...
             try {
                 gommettes.add(gom);
             } catch (Exception e){
                 System.out.println(e);
             }
-            System.out.println("white added in entity 3");
+//            System.out.println("white added in entity 3");
         } else if (gom.getGommette().getColour().equals("green")){
             this.nb_green++;
             gommettes.add(gom);
@@ -55,7 +53,7 @@ public class StudentEntity extends UserEntity {
             System.out.println("Gommette colour invalid.");
         }
 
-        System.out.println("gommette added in entity");
+//        System.out.println("gommette added in entity");
     }
 
     public String getNb_white() {

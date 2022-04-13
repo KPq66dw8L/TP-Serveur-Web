@@ -88,7 +88,7 @@ public class StartServer {
          * Handle post request from 1st form to add a student & 2nd form to add a gommette
          **/
         post("/users", (req, res) -> {
-            System.out.println("CHECK");
+//            System.out.println("CHECK");
 
             String firstname, lastname, group, gommette, description, studentID, tmpUsername = null, tmpPassword = null;
             req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
@@ -103,7 +103,7 @@ public class StartServer {
             gommette = req.queryParams("gommette");
             description = req.queryParams("description");
             studentID = req.queryParams("studentName");
-            System.out.println(gommette + " " + description + " " + studentID);
+//            System.out.println(gommette + " " + description + " " + studentID);
 
             //need authentificate()
             ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
@@ -128,7 +128,6 @@ public class StartServer {
             if (firstname != null && lastname != null && group != null){
                 return StudentGUI.create(firstname, lastname, group);
             } else if (gommette != null && description != null && studentID != null){
-                System.out.println("Router ACTION !!");
                 return StudentGUI.addGommette(gommette, description, studentID, currentProf.getId());
             } else {
                 return null;
@@ -167,14 +166,14 @@ public class StartServer {
         });
 
         /*
-         * OUTDATED
-         * L'URL ressemblera a: localhost:8081/users/delete?firstname=julien&lastname=herbaux
+         * WIP
+         * .queryParam -> localhost:8081/users/delete?firstname=julien&lastname=herbaux
+         * .params -> /users/:id/delete
          **/
-        delete("/users/delete", (req, res) -> {
-            String firstname = req.queryParams("firstname");
-            String lastname = req.queryParams("lastname");
+        delete("/users/:id/delete", (req, res) -> {
+            String id = req.params(":id");
 
-            return StudentGUI.delete(firstname, lastname);
+            return StudentGUI.delete(id);
         });
     }
 }

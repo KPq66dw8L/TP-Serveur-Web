@@ -7,8 +7,6 @@ public class Gommette {
     private String colour;
     private String description;
 
-    public static ArrayList<Gommette> gommettes; //tmp?
-
     public int getId() {
         return id;
     }
