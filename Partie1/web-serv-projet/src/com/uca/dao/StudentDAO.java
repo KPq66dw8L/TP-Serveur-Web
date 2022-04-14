@@ -210,4 +210,20 @@ public class StudentDAO extends _Generic<StudentEntity> {
         }
 
     }
+
+    public void deleteGommette(int idGommette){
+        try {
+            PreparedStatement statement;
+            statement = this.connect.prepareStatement("DELETE FROM givenGommettes WHERE id_gommette=?");
+            statement.setInt(1, idGommette);
+            statement.executeUpdate();
+
+            statement = this.connect.prepareStatement("DELETE FROM gommettes WHERE id=?");
+            statement.setInt(1, idGommette);
+            statement.executeUpdate();
+
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
 }

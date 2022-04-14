@@ -63,7 +63,7 @@ public class StudentGUI {
 
     public static String getUser(String idStudent) throws IOException, TemplateException {
 
-        // TODO : try catch : if the id does not correspond to any student
+        // TODO : try catch : if the id does not correspond to any student?
         Configuration configuration = _FreeMarkerInitializer.getContext();
 
         Map<String, Object> input = new HashMap<>();
@@ -182,6 +182,16 @@ public class StudentGUI {
         donneLaGommette.setId_prof(id_prof);
 
         StudentCore.addGommette(donneLaGommette);
+
+        return StudentGUI.getAllUsers(true);
+    }
+
+    public static Object deleteGommette(String idGommette) throws TemplateException, IOException {
+
+        int id = Integer.parseInt(idGommette);
+
+        StudentCore.deleteGommette(id);
+
 
         return StudentGUI.getAllUsers(true);
     }

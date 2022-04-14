@@ -32,4 +32,8 @@ public class StudentCore {
 //        System.out.println("addGommette dans StudentCore Action");
         new StudentDAO().addGommette(donneLeGommette);
     }
+
+    public static void deleteGommette(int idGommette){
+        new StudentDAO().deleteGommette(idGommette);
+    }
 }

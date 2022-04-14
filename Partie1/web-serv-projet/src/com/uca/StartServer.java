@@ -6,6 +6,7 @@ import com.uca.dao._Initializer;
 import com.uca.entity.ProfEntity;
 import com.uca.entity.UserEntity;
 import com.uca.gui.*;
+import org.h2.util.json.JSONObject;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.MultipartConfigElement;
@@ -143,6 +144,34 @@ public class StartServer {
             }
         });
 
+        put("/users", (req, res) -> {
+            System.out.println(req.body());
+
+            JSONObject json = new JSONObject(req.body());
+
+            String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
+
+            //need authentificate()
+            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
+            ProfEntity currentProf = null;
+            String[] parts;
+            try {
+                parts = req.cookie("user").split("----");
+                tmpUsername = parts[0];
+                tmpPassword = parts[1];
+            } catch (Exception e){
+            }
+            for (ProfEntity prof : profs){
+                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
+                    currentProf = prof;
+                    break;
+                }
+            }
+
+
+            return StudentGUI.addGommette();
+        });
+
         /*
          * Call create() to handle registration from form
          **/
@@ -182,6 +211,12 @@ public class StartServer {
             String id = req.params(":id");
 
             return StudentGUI.delete(id);
+        });
+
+        delete("/gommette/:id/delete", (req, res) -> {
+            String id = req.params(":id");
+
+            return StudentGUI.deleteGommette(id);
         });
     }
 }

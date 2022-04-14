@@ -5,7 +5,7 @@
 <ul>
     <#list users as user>
 
-        <li>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}, Gommettes: ${user.getNb_white()}, ${user.getNb_green()}, ${user.getNb_red()} </li>
+        <li>${user.id} - <a href="http://localhost:8081/users/${user.id}">${user.firstName} ${user.lastName}</a> in ${user.group}, Gommettes: ${user.getNb_white()}, ${user.getNb_green()}, ${user.getNb_red()} </li>
 
         <#if logged == true>
 <!--            <form method="post" id="delete-student">-->
