@@ -115,7 +115,7 @@ public class StudentGUI {
             template.setOutputEncoding("UTF-8");
             template.process(input, output);
         } catch (Exception e){
-//            System.out.println(e);
+            System.out.println(e);
         }
         return output.toString();
     }
@@ -184,6 +184,14 @@ public class StudentGUI {
         StudentCore.addGommette(donneLaGommette);
 
         return StudentGUI.getAllUsers(true);
+    }
+
+    public static Object modifyGommette(String gomColour, String gomDescription, String gommetteId, String studentId) throws TemplateException, IOException {
+
+        StudentCore.modifyGommette(Integer.parseInt(gommetteId), gomColour, gomDescription);
+
+        return StudentGUI.getUser(studentId);
+
     }
 
     public static Object deleteGommette(String idGommette) throws TemplateException, IOException {

@@ -208,7 +208,21 @@ public class StudentDAO extends _Generic<StudentEntity> {
             e.printStackTrace();
 //            System.out.println("Raté");
         }
+    }
 
+    public void modifyGommette(int gommetteId, String newColour, String newDescription){
+
+        try {
+            PreparedStatement statement;
+            statement = this.connect.prepareStatement("UPDATE gommettes SET colour=?, description=? WHERE id=?;");
+            statement.setString(1, newColour);
+            statement.setString(2, newDescription);
+            statement.setInt(3, gommetteId);
+            statement.executeUpdate();
+        } catch (SQLException e){
+            //e.printStackTrace();
+            System.out.println(gommetteId + " " + newColour + " " + newDescription);
+        }
     }
 
     public void deleteGommette(int idGommette){

@@ -137,6 +137,40 @@ public class StartServer {
             }
         });
 
+        /*
+         * Call create() to handle registration from form
+         **/
+        post("/register", (req, res) -> {
+
+            String firstname, lastname, username, newPassword;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+
+            // try?
+            firstname = req.queryParams("firstname");
+            lastname = req.queryParams("lastname");
+            username = req.queryParams("username");
+            newPassword = req.queryParams("password");
+
+            return ProfGUI.create(firstname, lastname, username, newPassword);
+        });
+
+        /*
+         * Call login(), also passes 'response' to be able to write a cookie
+         **/
+        post("/login", (req, res) -> {
+
+            String firstname, lastname, username, newPassword;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+
+            username = req.queryParams("username");
+            newPassword = req.queryParams("password");
+
+            return ProfGUI.login(username, newPassword, res);
+        });
+
+        /*
+         * Add a gommette to a user
+         **/
         put("/users", (req, res) -> {
 //            System.out.println(req.body());
 
@@ -173,34 +207,19 @@ public class StartServer {
         });
 
         /*
-         * Call create() to handle registration from form
+         * Modify a specific gommette
          **/
-        post("/register", (req, res) -> {
+        put("/users/:id", (req, res) -> {
+            String tmp = req.body().replaceAll("\"", "");
 
-            String firstname, lastname, username, newPassword;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+            String[] formParts = null;
+            try {
+                formParts = tmp.split("----");
+            } catch (Exception e){
+                System.out.println(e);
+            }
 
-            // try?
-            firstname = req.queryParams("firstname");
-            lastname = req.queryParams("lastname");
-            username = req.queryParams("username");
-            newPassword = req.queryParams("password");
-
-            return ProfGUI.create(firstname, lastname, username, newPassword);
-        });
-
-        /*
-         * Call login(), also passes 'response' to be able to write a cookie
-         **/
-        post("/login", (req, res) -> {
-
-            String firstname, lastname, username, newPassword;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
-
-            username = req.queryParams("username");
-            newPassword = req.queryParams("password");
-
-            return ProfGUI.login(username, newPassword, res);
+            return StudentGUI.modifyGommette(formParts[0], formParts[1], formParts[2], req.params(":id"));
         });
 
         /*

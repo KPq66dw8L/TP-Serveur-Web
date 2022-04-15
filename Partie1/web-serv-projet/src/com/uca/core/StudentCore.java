@@ -33,6 +33,10 @@ public class StudentCore {
         new StudentDAO().addGommette(donneLeGommette);
     }
 
+    public static void modifyGommette(int gommetteId, String newColour, String newDescription){
+        new StudentDAO().modifyGommette(gommetteId, newColour, newDescription);
+    }
+
     public static void deleteGommette(int idGommette){
         new StudentDAO().deleteGommette(idGommette);
     }

@@ -46,8 +46,29 @@ const http = new EasyHTTP;
   
 document.body.onload = async () => {
 
+    /*
+    * FrontEnd functionalities part:
+    */
+
+    let modifyButtons = document.querySelectorAll('#modify-gommette');
+
+    modifyButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            button.parentNode.style.display = "none";
+            button.parentNode.nextElementSibling.style.display = "block";
+            
+        });
+    });
+
+    /*
+    * Middleware part:
+    */
+
     let buttons = null;
     let forms = null;
+    let modifyForms = document.querySelectorAll("#modify-form");
 
     // distinguish if we are on the /users page or the /users/:id page
     if(window.location.href === 'http://localhost:8081/users'){
@@ -58,7 +79,7 @@ document.body.onload = async () => {
     }
 
     /*
-    * Delete a resource
+    * Delete a resource, either a student or a gommette
     */
 
     // for each to handle the click on every buttons generated on the page
@@ -88,27 +109,51 @@ document.body.onload = async () => {
     });
 
     /*
-    * Update a resource
+    * Update a student, by adding it a gommette
     */
 
-    forms.forEach(form => {
-        form.addEventListener('submit', function handleSubmit(e) {
-            e.preventDefault(); // the form will not be submitted yet
+    if (forms != null) {
+        forms.forEach(form => {
+            form.addEventListener('submit', function handleSubmit(e) {
+                e.preventDefault(); // the form will not be submitted yet
+        
+                // let data = {
+                //     gommette: e.target.elements.gommette.value,
+                //     description: e.target.elements.description.value,
+                //     id_student: e.target.elements.studentId.value,
+                // };
     
-            // let data = {
-            //     gommette: e.target.elements.gommette.value,
-            //     description: e.target.elements.description.value,
-            //     id_student: e.target.elements.studentId.value,
-            // };
+                let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;
+    
+                http.put("http://localhost:8081/users", data)
+          
+                // Resolving promise for response data
+                .then(data => console.log(data))
+    
+                .then(() => { location.reload(); form.reset(); })
+                
+                // Resolving promise for error
+                .catch(err => console.log(err));
+            });
+        });
+    }
 
-            let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;
+    /*
+    * Update a gommette 
+    */
 
-            http.put("http://localhost:8081/users", data)
+    modifyForms.forEach(form => {
+        form.addEventListener('submit', function handleSubmit(e) {
+            e.preventDefault();
+
+            let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.gommetteId.value}`;
+
+            http.put(`http://localhost:8081/users/${e.target.elements.studentId.value}`, data)
       
             // Resolving promise for response data
             .then(data => console.log(data))
 
-            .then(() => { location.reload(); form.reset(); })
+            .then(() => { location.reload(); })
             
             // Resolving promise for error
             .catch(err => console.log(err));
