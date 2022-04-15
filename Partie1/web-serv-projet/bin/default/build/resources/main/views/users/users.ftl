@@ -8,15 +8,10 @@
         <li>${user.id} - <a href="http://localhost:8081/users/${user.id}">${user.firstName} ${user.lastName}</a> in ${user.group}, Gommettes: ${user.getNb_white()}, ${user.getNb_green()}, ${user.getNb_red()} </li>
 
         <#if logged == true>
-<!--            <form method="post" id="delete-student">-->
-<!--                <input type="hidden" name="_method" value="delete" />-->
-<!--                <input type="hidden" name="_studentName" id="_studentName" value='${user.id}' />-->
-<!--                <button type="submit">Delete student</button>-->
-<!--            </form>-->
 
             <a data-student-id="http://localhost:8081/users/${user.id}/delete" href="#" id="delete-student">Delete student</a>
 
-            <form method='post' enctype='multipart/form-data'>
+            <form method='post' enctype='multipart/form-data' id="add-gommette">
 
                 <select name="gommette" id="gommette">
                     <option value="white">White</option>

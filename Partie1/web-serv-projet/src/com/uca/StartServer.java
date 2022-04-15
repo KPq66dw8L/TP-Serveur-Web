@@ -1,21 +1,14 @@
 package com.uca;
 
 import com.uca.core.ProfCore;
-import com.uca.dao.StudentDAO;
 import com.uca.dao._Initializer;
 import com.uca.entity.ProfEntity;
-import com.uca.entity.UserEntity;
-import com.uca.gui.*;
-import org.h2.util.json.JSONObject;
-import org.mindrot.jbcrypt.BCrypt;
+import com.uca.gui.ProfGUI;
+import com.uca.gui.StudentGUI;
 
 import javax.servlet.MultipartConfigElement;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
-import static java.lang.Integer.parseInt;
 import static spark.Spark.*;
 
 public class StartServer {
@@ -145,9 +138,16 @@ public class StartServer {
         });
 
         put("/users", (req, res) -> {
-            System.out.println(req.body());
+//            System.out.println(req.body());
 
-            JSONObject json = new JSONObject(req.body());
+            String tmp = req.body().replaceAll("\"", "");
+
+            String[] formParts = null;
+            try {
+                formParts = tmp.split("----");
+            } catch (Exception e){
+                System.out.println(e);
+            }
 
             String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
 
@@ -169,7 +169,7 @@ public class StartServer {
             }
 
 
-            return StudentGUI.addGommette();
+            return StudentGUI.addGommette(formParts[0], formParts[1], formParts[2], currentProf.getId());
         });
 
         /*

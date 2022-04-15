@@ -19,7 +19,7 @@
                     <option value="red">Red</option>
                 </select>
                 <input required type="text" name="description">
-                <input type="hidden" value='${user.id}' name="studentName">
+                <input type="hidden" value='${user.id}' name="studentId">
                 <button type="submit" name="add-gommette">Add gommette</button>
             </form>
         </#if>

@@ -33,7 +33,8 @@ class EasyHTTP {
         });
   
         // Awaiting for the resource to be deleted
-        const resData = await response.json();
+        // const resData = await response.json();
+        const resData = 'resource updated...';
   
         // Return response data 
         return resData;
@@ -94,18 +95,20 @@ document.body.onload = async () => {
         form.addEventListener('submit', function handleSubmit(e) {
             e.preventDefault(); // the form will not be submitted yet
     
-            let data = {
-                gommette: e.target.elements.gommette.value,
-                description: e.target.elements.description.value,
-                name: e.target.elements.studentName.value,
-            };
+            // let data = {
+            //     gommette: e.target.elements.gommette.value,
+            //     description: e.target.elements.description.value,
+            //     id_student: e.target.elements.studentId.value,
+            // };
+
+            let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;
 
             http.put("http://localhost:8081/users", data)
       
             // Resolving promise for response data
             .then(data => console.log(data))
 
-            .then(() => { location.reload(); })
+            .then(() => { location.reload(); form.reset(); })
             
             // Resolving promise for error
             .catch(err => console.log(err));
