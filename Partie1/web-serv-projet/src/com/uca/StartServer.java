@@ -1,8 +1,12 @@
 package com.uca;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uca.core.ProfCore;
 import com.uca.dao._Initializer;
+import com.uca.entity.Gommette;
 import com.uca.entity.ProfEntity;
+import com.uca.entity.StudentEntity;
+import com.uca.entity.User;
 import com.uca.gui.ProfGUI;
 import com.uca.gui.StudentGUI;
 
@@ -172,16 +176,33 @@ public class StartServer {
          * Add a gommette to a user
          **/
         put("/users", (req, res) -> {
+            //if you want to check the JSON.stringify in the PUT's payload
 //            System.out.println(req.body());
 
-            String tmp = req.body().replaceAll("\"", "");
-
-            String[] formParts = null;
+            Gommette gomTmp = null;
+            ObjectMapper mapper = new ObjectMapper();
             try {
-                formParts = tmp.split("----");
-            } catch (Exception e){
+                /*
+                 * JSON from String to Object.
+                 * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
+                 * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
+                 **/
+                gomTmp = mapper.readValue(req.body(), Gommette.class);
+            } catch ( Exception e ) {
                 System.out.println(e);
             }
+
+
+
+
+//            String tmp = req.body().replaceAll("\"", "");
+//            // a l'ancienne
+//            String[] formParts = null;
+//            try {
+//                formParts = tmp.split("----");
+//            } catch (Exception e){
+//                System.out.println(e);
+//            }
 
             String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
 
@@ -203,23 +224,38 @@ public class StartServer {
             }
 
 
-            return StudentGUI.addGommette(formParts[0], formParts[1], formParts[2], currentProf.getId());
+//            return StudentGUI.addGommette(formParts[0], formParts[1], formParts[2], currentProf.getId());
+            return StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), currentProf.getId());
         });
 
         /*
          * Modify a specific gommette
          **/
         put("/users/:id", (req, res) -> {
-            String tmp = req.body().replaceAll("\"", "");
+//            String tmp = req.body().replaceAll("\"", "");
+//
+//            String[] formParts = null;
+//            try {
+//                formParts = tmp.split("----");
+//            } catch (Exception e){
+//                System.out.println(e);
+//            }
 
-            String[] formParts = null;
+            Gommette gomTmp = null;
+            ObjectMapper mapper = new ObjectMapper();
             try {
-                formParts = tmp.split("----");
-            } catch (Exception e){
+                /*
+                 * JSON from String to Object.
+                 * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
+                 * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
+                 **/
+                gomTmp = mapper.readValue(req.body(), Gommette.class);
+            } catch ( Exception e ) {
                 System.out.println(e);
             }
 
-            return StudentGUI.modifyGommette(formParts[0], formParts[1], formParts[2], req.params(":id"));
+            //return StudentGUI.modifyGommette(formParts[0], formParts[1], formParts[2], req.params(":id"));
+            return StudentGUI.modifyGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), req.params(":id"));
         });
 
         /*
