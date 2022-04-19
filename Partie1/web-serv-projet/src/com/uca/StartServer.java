@@ -5,8 +5,6 @@ import com.uca.core.ProfCore;
 import com.uca.dao._Initializer;
 import com.uca.entity.Gommette;
 import com.uca.entity.ProfEntity;
-import com.uca.entity.StudentEntity;
-import com.uca.entity.User;
 import com.uca.gui.ProfGUI;
 import com.uca.gui.StudentGUI;
 

@@ -117,13 +117,13 @@ document.body.onload = async () => {
             form.addEventListener('submit', function handleSubmit(e) {
                 e.preventDefault(); // the form will not be submitted yet
         
-                // let data = {
-                //     gommette: e.target.elements.gommette.value,
-                //     description: e.target.elements.description.value,
-                //     id_student: e.target.elements.studentId.value,
-                // };
+                let data = {
+                    colour: e.target.elements.gommette.value,
+                    description: e.target.elements.description.value,
+                    id: e.target.elements.studentId.value, //we send the student value to the server
+                };
     
-                let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;
+                // let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;
     
                 http.put("http://localhost:8081/users", data)
           
@@ -139,14 +139,20 @@ document.body.onload = async () => {
     }
 
     /*
-    * Update a gommette 
+    * Update a gommette, one can modify the description and the colour
     */
 
     modifyForms.forEach(form => {
         form.addEventListener('submit', function handleSubmit(e) {
             e.preventDefault();
 
-            let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.gommetteId.value}`;
+            let data = {
+                colour: e.target.elements.gommette.value,
+                description: e.target.elements.description.value,
+                id: e.target.elements.gommetteId.value, //we send the student value to the server
+            };
+
+            //let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.gommetteId.value}`;
 
             http.put(`http://localhost:8081/users/${e.target.elements.studentId.value}`, data)
       
