@@ -1,5 +1,10 @@
 package com.uca.gui;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.uca.core.ProfCore;
 import com.uca.core.StudentCore;
 import com.uca.entity.GivenGommettes;
@@ -16,10 +21,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -35,30 +37,40 @@ public class StudentGUI {
      * List all students and tell the template of user is logged in from the cookie "user"
      **/
     public static String getAllUsers(boolean logged) throws IOException, TemplateException {
-        Configuration configuration = _FreeMarkerInitializer.getContext();
 
-        /*
-         * 1 call in .ftl = 1 obj in Java, with the HashMap
-         **/
-        Map<String, Object> input = new HashMap<>();
-
-        input.put("users", StudentCore.getAllUsers());
-        input.put("logged", logged);
-
-
-        Writer output = new StringWriter();
-        /*
-         * try-catch, otherwise an error in template gives a 505 error and no traceback
-         **/
+        ArrayList<StudentEntity> students = StudentCore.getAllUsers();
+        String json = new String();
         try {
-            Template template = configuration.getTemplate("users/users.ftl");
-            template.setOutputEncoding("UTF-8");
-            template.process(input, output);
-        } catch (Exception e){
-//            System.out.println(e);
+            // create `ObjectMapper` instance
+            ObjectMapper mapper = new ObjectMapper();
+
+            // create `ArrayNode` object
+            ArrayNode arrayNode = mapper.createArrayNode();
+
+            // create each JSON object
+            for (StudentEntity student : students) {
+                ObjectNode user = mapper.createObjectNode();
+                user.put("id", student.getId());
+                user.put("firstName", student.getFirstName());
+                user.put("lastName", student.getLastName());
+                user.put("group", student.getGroup());
+                user.put("white", student.getNb_white());
+                user.put("green", student.getNb_green());
+                user.put("red", student.getNb_red());
+
+                // add JSON users to array
+                arrayNode.addAll(Arrays.asList(user));
+            }
+
+            // convert `ArrayNode` to pretty-print JSON
+            // without pretty-print, use `arrayNode.toString()` method
+            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-//        System.out.println("getAllUser ACTION !!");
-        return output.toString();
+
+        return json;
     }
 
     public static String getUser(String idStudent) throws IOException, TemplateException {
@@ -123,17 +135,25 @@ public class StudentGUI {
     /*
      * Handle creation of a new student entity in Java
      **/
-    public static StudentEntity create(String firstname, String lastname, String group) throws SQLException, IOException, TemplateException {
+    public static StudentEntity create(String newStudent) throws SQLException, IOException, TemplateException {
+        StudentEntity tmpStu = null;
 
-        StudentEntity newUser = new StudentEntity();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        try {
+            /*
+             * JSON from String to Object.
+             * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
+             * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
+             **/
+            tmpStu = mapper.readValue(newStudent, StudentEntity.class);
+        } catch ( Exception e ) {
+            System.out.println(e);
+        }
 
-        newUser.setFirstName(firstname);
-        newUser.setLastName(lastname);
-        newUser.setGroup(group);
+        StudentCore.create(tmpStu);
 
-        newUser = StudentCore.create(newUser);
-
-        return newUser;
+        return null;
     }
 
     public static String delete(String idStudent) throws SQLException, TemplateException, IOException {

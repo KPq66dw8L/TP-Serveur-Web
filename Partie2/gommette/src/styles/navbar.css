@@ -1,0 +1,11 @@
+.navbar ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    margin: 2rem;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: inherit;
+}

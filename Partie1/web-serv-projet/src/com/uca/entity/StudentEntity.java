@@ -18,10 +18,6 @@ public class StudentEntity extends UserEntity {
     private String group;
     public ArrayList<GivenGommettes> gommettes = new ArrayList<>();
 
-//    public ArrayList<GivenGommettes> getGommettes() {
-//        return gommettes;
-//    }
-
     public String getGroup() {
         return group;
     }

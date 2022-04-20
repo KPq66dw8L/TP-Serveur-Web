@@ -22,6 +22,29 @@ public class StartServer {
 
 
         _Initializer.Init();
+
+        options("/*",
+                (request, response) -> {
+
+                    String accessControlRequestHeaders = request
+                            .headers("Access-Control-Request-Headers");
+                    if (accessControlRequestHeaders != null) {
+                        response.header("Access-Control-Allow-Headers",
+                                accessControlRequestHeaders);
+                    }
+
+                    String accessControlRequestMethod = request
+                            .headers("Access-Control-Request-Method");
+                    if (accessControlRequestMethod != null) {
+                        response.header("Access-Control-Allow-Methods",
+                                accessControlRequestMethod);
+                    }
+
+                    return "OK";
+                });
+
+        before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
+
         /*
         * ***
         * Router
@@ -33,37 +56,8 @@ public class StartServer {
          * Print all students, and more features to logged in profs
          **/
         get("/users", (req, res) -> {
-
-            /*
-             * From the infos in the cookie, we check if the user exists in our db
-             **/
-            //need authentificate()
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-            ProfEntity currentProf = null;
-            String tmpUsername = new String();
-            String tmpPassword = new String();
-            String[] parts;
-            try {
-                parts = req.cookie("user").split("----");
-                tmpUsername = parts[0];
-                tmpPassword = parts[1];
-            } catch (Exception e){
-            }
-            for (ProfEntity prof : profs){
-                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
-                    currentProf = prof;
-                    break;
-                }
-            }
-            /*
-             * If the user exists in our db and the cookie is written, then he is logged-in and he can see the students(everyone can) + add gommettes etc
-             * Else he can only see the list of students
-             **/
-            if (currentProf != null){
-                return StudentGUI.getAllUsers(true);
-            } else {
-                return StudentGUI.getAllUsers(false);
-            }
+            System.out.println("Called get /users");
+            return StudentGUI.getAllUsers(false);
         });
 
         /*
@@ -93,50 +87,26 @@ public class StartServer {
          * Handle post request from 1st form to add a student & 2nd form to add a gommette
          **/
         post("/users", (req, res) -> {
-//            System.out.println("CHECK");
-
-            String firstname, lastname, group, gommette, description, studentID, tmpUsername = null, tmpPassword = null;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
-
-
-            // on recup les infos du 1er formulaire
-            firstname = req.queryParams("firstname");
-            lastname = req.queryParams("lastname");
-            group = req.queryParams("group");
-
-            // on recup les infos du 2eme formulaire
-            gommette = req.queryParams("gommette");
-            description = req.queryParams("description");
-            studentID = req.queryParams("studentName");
-//            System.out.println(gommette + " " + description + " " + studentID);
 
             //need authentificate()
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-            ProfEntity currentProf = null;
-            String[] parts;
-            try {
-                parts = req.cookie("user").split("----");
-                tmpUsername = parts[0];
-                tmpPassword = parts[1];
-            } catch (Exception e){
-            }
-            for (ProfEntity prof : profs){
-                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
-                    currentProf = prof;
-                    break;
-                }
-            }
-
-            res.redirect("/users");
-
-            // en fonction du formulaire remplit, on appelle la bonne fonction
-            if (firstname != null && lastname != null && group != null){
-                return StudentGUI.create(firstname, lastname, group);
-            } else if (gommette != null && description != null && studentID != null){
-                return StudentGUI.addGommette(gommette, description, studentID, currentProf.getId());
-            } else {
-                return null;
-            }
+//            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
+//            ProfEntity currentProf = null;
+//            String[] parts;
+//            try {
+//                parts = req.cookie("user").split("----");
+//                tmpUsername = parts[0];
+//                tmpPassword = parts[1];
+//            } catch (Exception e){
+//            }
+//            for (ProfEntity prof : profs){
+//                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
+//                    currentProf = prof;
+//                    break;
+//                }
+//            }
+            res.status(201);
+            StudentGUI.create(req.body());
+            return res;
         });
 
         /*
