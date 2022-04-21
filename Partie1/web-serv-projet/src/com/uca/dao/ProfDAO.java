@@ -33,6 +33,7 @@ public class ProfDAO extends _Generic<ProfEntity> {
                 entity.setSalt(resultSet.getString("salt"));
                 entity.setHashedPassword(resultSet.getString("hashedPassword"));
 
+
                 entities.add(entity);
 
             }

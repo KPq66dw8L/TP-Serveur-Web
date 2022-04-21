@@ -1,4 +1,19 @@
 
 #add-student-form {
-    margin-bottom: 30vh;
+    margin: 10vh 0;
+}
+
+.user {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.addOrDelete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }

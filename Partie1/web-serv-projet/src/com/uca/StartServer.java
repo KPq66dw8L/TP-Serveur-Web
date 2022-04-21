@@ -77,13 +77,6 @@ public class StartServer {
         });
 
         /*
-         * Print the login page
-         **/
-        get("/login", (req, res) -> {
-            return ProfGUI.loginPage();
-        });
-
-        /*
          * Handle post request from 1st form to add a student & 2nd form to add a gommette
          **/
         post("/users", (req, res) -> {
@@ -104,8 +97,12 @@ public class StartServer {
 //                    break;
 //                }
 //            }
-            res.status(201);
-            StudentGUI.create(req.body());
+
+            if (StudentGUI.create(req.body())) {
+                res.status(201);
+            } else {
+                res.status(500);
+            }
             return res;
         });
 
@@ -114,16 +111,9 @@ public class StartServer {
          **/
         post("/register", (req, res) -> {
 
-            String firstname, lastname, username, newPassword;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+            ProfGUI.create(req.body());
 
-            // try?
-            firstname = req.queryParams("firstname");
-            lastname = req.queryParams("lastname");
-            username = req.queryParams("username");
-            newPassword = req.queryParams("password");
-
-            return ProfGUI.create(firstname, lastname, username, newPassword);
+            return res;
         });
 
         /*
@@ -131,21 +121,21 @@ public class StartServer {
          **/
         post("/login", (req, res) -> {
 
-            String firstname, lastname, username, newPassword;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
-
-            username = req.queryParams("username");
-            newPassword = req.queryParams("password");
-
-            return ProfGUI.login(username, newPassword, res);
+            String tmpProf = ProfGUI.login(req.body());
+//            res.header("user", tmpProf);
+            res.body(tmpProf);
+            if (tmpProf == null) {
+                res.status(401);
+            }
+            System.out.println(res.body());
+            return res;
         });
 
         /*
          * Add a gommette to a user
          **/
         put("/users", (req, res) -> {
-            //if you want to check the JSON.stringify in the PUT's payload
-//            System.out.println(req.body());
+
 
             Gommette gomTmp = null;
             ObjectMapper mapper = new ObjectMapper();
@@ -175,25 +165,30 @@ public class StartServer {
             String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
 
             //need authentificate()
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-            ProfEntity currentProf = null;
-            String[] parts;
-            try {
-                parts = req.cookie("user").split("----");
-                tmpUsername = parts[0];
-                tmpPassword = parts[1];
-            } catch (Exception e){
-            }
-            for (ProfEntity prof : profs){
-                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
-                    currentProf = prof;
-                    break;
-                }
-            }
+//            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
+//            ProfEntity currentProf = null;
+//            String[] parts;
+//            try {
+//                parts = req.cookie("user").split("----");
+//                tmpUsername = parts[0];
+//                tmpPassword = parts[1];
+//            } catch (Exception e){
+//            }
+//            for (ProfEntity prof : profs){
+//                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
+//                    currentProf = prof;
+//                    break;
+//                }
+//            }
 
 
 //            return StudentGUI.addGommette(formParts[0], formParts[1], formParts[2], currentProf.getId());
-            return StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), currentProf.getId());
+
+
+
+
+//            StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), currentProf.getId());
+            return res;
         });
 
         /*
@@ -233,7 +228,9 @@ public class StartServer {
         delete("/users/:id/delete", (req, res) -> {
             String id = req.params(":id");
 
-            return StudentGUI.delete(id);
+            StudentGUI.delete(id);
+
+            return res;
         });
 
         delete("/gommette/:id/delete", (req, res) -> {

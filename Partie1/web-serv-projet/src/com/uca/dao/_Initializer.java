@@ -23,15 +23,7 @@ public class _Initializer {
                     "department varchar(100)); ");
             statement.executeUpdate();
 
-//            statement = connection.prepareStatement("DELETE FROM givenGommettes cascade;");
-//            statement.executeUpdate();
-//            statement = connection.prepareStatement("DELETE FROM students cascade;");
-//            statement.executeUpdate();
-//            statement = connection.prepareStatement("DELETE FROM gommettes cascade;");
-//            statement.executeUpdate();
 
-//            statement = connection.prepareStatement("DELETE FROM profs cascade;");
-//            statement.executeUpdate();
 
 //            statement = connection.prepareStatement("DROP TABLE profs;");
 //            statement.executeUpdate();

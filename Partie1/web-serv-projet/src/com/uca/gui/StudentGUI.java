@@ -135,7 +135,7 @@ public class StudentGUI {
     /*
      * Handle creation of a new student entity in Java
      **/
-    public static StudentEntity create(String newStudent) throws SQLException, IOException, TemplateException {
+    public static boolean create(String newStudent) throws SQLException, IOException, TemplateException {
         StudentEntity tmpStu = null;
 
         ObjectMapper mapper = new ObjectMapper();
@@ -151,9 +151,11 @@ public class StudentGUI {
             System.out.println(e);
         }
 
-        StudentCore.create(tmpStu);
+        if (StudentCore.create(tmpStu) != null) {
+            return false;
+        }
 
-        return null;
+        return true;
     }
 
     public static String delete(String idStudent) throws SQLException, TemplateException, IOException {
