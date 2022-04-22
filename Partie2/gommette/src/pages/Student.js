@@ -2,10 +2,36 @@ import React, {useEffect, useState} from "react";
 import {
   useParams
 } from "react-router-dom";
+import Select from 'react-select';
 
 import EasyHTTP from './elements/EasyHTTP';
 
 const http = new EasyHTTP();
+
+function deleteGommetteHandler(id) {
+    let link = "http://localhost:8081/gommette/"+id+"/delete";
+    http.delete(link)
+    .then(data => {
+        console.log(data);
+        window.location.reload(false); // TODO: find a way without too many props to refresh the main component 
+    })
+    .catch(err => console.log(err));
+}
+
+function modifyGommetteHandler(e, idGommette, gommetteColour, gommetteDescription, idStudent) {
+    e.preventDefault();
+
+    http.put(`http://localhost:8081/users/${idStudent}/gommette`, {
+        colour: gommetteColour,
+        description: gommetteDescription,
+        id: idGommette
+    })
+    .then(data => {
+        console.log(data); 
+        window.location.reload(false); 
+    })
+    .catch(err => console.log(err));
+}
 
 export default function Student() {
 
@@ -49,7 +75,7 @@ function InfosStudent({user}) {
             <ul>
                 {user.gommettes.white.map(gommette => {
                     return (
-                        <GommettesPerColour gommette={gommette} key={gommette.id} />
+                        <GommettesPerColour gommette={gommette} key={gommette.id} idStudent={user.id}/>
                     );
                 })}
             </ul>
@@ -57,7 +83,7 @@ function InfosStudent({user}) {
             <ul>
                 {user.gommettes.green.map(gommette => {
                     return (
-                        <GommettesPerColour gommette={gommette} key={gommette.id + 1} />
+                        <GommettesPerColour gommette={gommette} key={gommette.id} idStudent={user.id}/>
                     );
                 })}
             </ul>
@@ -65,7 +91,7 @@ function InfosStudent({user}) {
             <ul>
                 {user.gommettes.red.map(gommette => {
                     return (
-                        <GommettesPerColour gommette={gommette} key={gommette.id + 2} />
+                        <GommettesPerColour gommette={gommette} key={gommette.id} idStudent={user.id}  />
                     );
                 })}
             </ul>
@@ -75,7 +101,19 @@ function InfosStudent({user}) {
     );
 }
 
-function GommettesPerColour({gommette}) {
+function GommettesPerColour({gommette, idStudent}) {
+
+    let [modifyGommette, setModifyGommette] = useState(false);
+    let [mot, setMot] = useState("Start");
+
+    const [gommetteColour, setGommetteColour] = useState(gommette.colour);
+    const [gommetteDescription, setGommetteDescription] = useState(gommette.description);
+
+    const options = [
+        { value: 'white', label: 'White' },
+        { value: 'green', label: 'Green' },
+        { value: 'red', label: 'Red' }
+    ];
 
     return (
         <li>
@@ -83,7 +121,14 @@ function GommettesPerColour({gommette}) {
             Description: {gommette.description}.
             Date: {gommette.date}.
             Prof id: {gommette.prof}.
-            {/* <a data-gommette-id="http://localhost:8081/gommette/${gommette.id}/delete" href="#" id="delete-gommette">Delete gommette</a> */}
+            <button onClick={() => deleteGommetteHandler(gommette.id)}>Delete</button>
+            <button onClick={() => {setModifyGommette(!modifyGommette); modifyGommette ? setMot("End") : setMot("Start");}}>{mot} modifying</button>
+
+            { modifyGommette && <form action="">
+                <Select options={options} onChange={(e) => setGommetteColour(e.value)}/>
+                <input required type="text" name="description" placeholder="description" onChange={e => setGommetteDescription(e.target.value)}/>
+                <button type="submit" onClick={(e) => modifyGommetteHandler(e, gommette.id, gommetteColour, gommetteDescription, idStudent)}>Submit modifications</button>
+            </form> }
         </li>
     );
 }

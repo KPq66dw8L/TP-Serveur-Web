@@ -140,7 +140,7 @@ public class StudentGUI {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        System.out.println(json);
+
         return json;
     }
 

@@ -185,14 +185,8 @@ public class StartServer {
          * Modify a specific gommette
          **/
         put("/users/:id/gommette", (req, res) -> {
-//            String tmp = req.body().replaceAll("\"", "");
-//
-//            String[] formParts = null;
-//            try {
-//                formParts = tmp.split("----");
-//            } catch (Exception e){
-//                System.out.println(e);
-//            }
+
+            System.out.println("RECU");
 
             Gommette gomTmp = null;
             ObjectMapper mapper = new ObjectMapper();
@@ -207,8 +201,8 @@ public class StartServer {
                 System.out.println(e);
             }
 
-            //return StudentGUI.modifyGommette(formParts[0], formParts[1], formParts[2], req.params(":id"));
-            return StudentGUI.modifyGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), req.params(":id"));
+            StudentGUI.modifyGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), req.params(":id"));
+            return res;
         });
 
         /*
