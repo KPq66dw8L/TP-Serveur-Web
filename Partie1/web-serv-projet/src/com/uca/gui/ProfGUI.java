@@ -122,6 +122,7 @@ public class ProfGUI {
                     user.put("id", currentProf.getId());
                     user.put("firstName", prof.getFirstName());
                     user.put("lastName", prof.getLastName());
+                    user.put("username", prof.getUsername());
                     user.put("hashedPassword", currentProf.getHashedPassword());
 
                     // convert `ObjectNode` to pretty-print JSON

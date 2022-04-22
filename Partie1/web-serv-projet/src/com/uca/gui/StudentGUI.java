@@ -76,60 +76,72 @@ public class StudentGUI {
     public static String getUser(String idStudent) throws IOException, TemplateException {
 
         // TODO : try catch : if the id does not correspond to any student?
-        Configuration configuration = _FreeMarkerInitializer.getContext();
 
-        Map<String, Object> input = new HashMap<>();
 
         StudentEntity student = null;
+        String json = new String();
 
+        // on recup l'etudiant
         for (StudentEntity stu : StudentCore.getAllUsers()) {
             if (stu.getId() == Integer.parseInt(idStudent)) {
                 student = stu;
             }
         }
-
-        input.put("user", student);
-
-//        ArrayList<Gommette> gommettes_white = new ArrayList<>(), gommettes_green = new ArrayList<>(), gommettes_red = new ArrayList<>();
-//        for (GivenGommettes givenGom : student.gommettes) {
-//            if (givenGom.getGommette().getColour().equals("white")){
-//                gommettes_white.add(givenGom.getGommette());
-//            } else if (givenGom.getGommette().getColour().equals("green")){
-//                gommettes_green.add(givenGom.getGommette());
-//            } else {
-//                gommettes_red.add(givenGom.getGommette());
-//            }
-//        }
-//
-//        input.put("gommetteWhite", gommettes_white);
-//        input.put("gommetteGreen", gommettes_green);
-//        input.put("gommetteRed", gommettes_red);
-
-        ArrayList<GivenGommettes> gommettes_white = new ArrayList<>(), gommettes_green = new ArrayList<>(), gommettes_red = new ArrayList<>();
-        for (GivenGommettes givenGom : student.gommettes) {
-            if (givenGom.getGommette().getColour().equals("white")){
-                gommettes_white.add(givenGom);
-            } else if (givenGom.getGommette().getColour().equals("green")){
-                gommettes_green.add(givenGom);
-            } else {
-                gommettes_red.add(givenGom);
-            }
-        }
-
-        input.put("gommetteWhite", gommettes_white);
-        input.put("gommetteGreen", gommettes_green);
-        input.put("gommetteRed", gommettes_red);
-
-        Writer output = new StringWriter();
-
+        // on met en forme le json a renvoyer
         try {
-            Template template = configuration.getTemplate("users/student.ftl");
-            template.setOutputEncoding("UTF-8");
-            template.process(input, output);
-        } catch (Exception e){
-            System.out.println(e);
+            // create `ObjectMapper` instance
+            ObjectMapper mapper = new ObjectMapper();
+
+            // create `ArrayNode` object for the student
+            ObjectNode user = mapper.createObjectNode();
+            user.put("id", student.getId());
+            user.put("firstName", student.getFirstName());
+            user.put("lastName", student.getLastName());
+            user.put("group", student.getGroup());
+            user.put("nbWhite", student.getNb_white());
+            user.put("nbGreen", student.getNb_green());
+            user.put("nbRed", student.getNb_red());
+
+            // create `ArrayNode` objects for the student's gommettes
+            ArrayNode arrayNodeWhite = mapper.createArrayNode();
+            ArrayNode arrayNodeGreen = mapper.createArrayNode();
+            ArrayNode arrayNodeRed = mapper.createArrayNode();
+
+            // sort the gommettes
+            for (GivenGommettes gom : student.gommettes) {
+                // temporary object to get each gommette
+                ObjectNode studentGommette = mapper.createObjectNode();
+                studentGommette.put("id", gom.getGommette().getId());
+                studentGommette.put("colour", gom.getGommette().getColour());
+                studentGommette.put("description", gom.getGommette().getDescription());
+                studentGommette.put("date", gom.getDate());
+                studentGommette.put("prof", gom.getId_prof());
+                if (gom.getGommette().getColour().equals("white")) {
+                    arrayNodeWhite.add(studentGommette);
+                } else if (gom.getGommette().getColour().equals("green")) {
+                    arrayNodeGreen.add(studentGommette);
+                } else {
+                    arrayNodeRed.add(studentGommette);
+                }
+            }
+            ObjectNode everyGommettes = mapper.createObjectNode();
+
+            // nest the arrays
+            everyGommettes.set("white", arrayNodeWhite);
+            everyGommettes.set("green", arrayNodeGreen);
+            everyGommettes.set("red", arrayNodeRed);
+
+            user.set("gommettes", everyGommettes);
+
+            // convert `ObjectNode` to pretty-print JSON
+            // without pretty-print, use `arrayNode.toString()` method
+            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(user);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        return output.toString();
+        System.out.println(json);
+        return json;
     }
 
     /*
@@ -187,25 +199,56 @@ public class StudentGUI {
      * Handle the creation of a new Gommette + a new GivenGommette. Also call the necessary function to create everything in the db.
      * Return the list of students updated, with the logged-in parameter as one already need to be logged to be able to manipulate gommettes.
      **/
-    public static Object addGommette(String gommette, String description, String studentID, int id_prof) throws TemplateException, IOException {
-        Gommette newGommette = new Gommette();
-        newGommette.setColour(gommette);
-        newGommette.setDescription(description);
-        GivenGommettes donneLaGommette = new GivenGommettes();
+    public static boolean addGommette(String body, String hashedPwd) throws TemplateException, IOException {
 
-        int id_student = parseInt(studentID);
-        donneLaGommette.setId_student(id_student);
+        Integer id_prof = null;
+        // Get the prof who gave the gommette
+        for (ProfEntity pro : ProfCore.getAllUsers()) {
+            if (hashedPwd.equals(pro.getHashedPassword())) {
+                id_prof = pro.getId();
+            }
+        }
+        if (id_prof == null) {
+            return false;
+        }
 
-        donneLaGommette.setGommette(newGommette);
+        // Set the gommette colour & description and the student's id in a temporary object, form the JSON received
+        Gommette gomTmp = null;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            /*
+             * JSON from String to Object.
+             * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
+             * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
+             **/
+            gomTmp = mapper.readValue(body, Gommette.class);
+        } catch ( Exception e ) {
+            System.out.println(e);
+            return false;
+        }
 
-        Date date = new Date();
-        donneLaGommette.setDate(date);
+        try {
+            Gommette newGommette = new Gommette();
+            newGommette.setColour(gomTmp.getColour());
+            newGommette.setDescription(gomTmp.getDescription());
+            GivenGommettes donneLaGommette = new GivenGommettes();
 
-        donneLaGommette.setId_prof(id_prof);
+            int id_student = gomTmp.getId();
+            donneLaGommette.setId_student(id_student);
 
-        StudentCore.addGommette(donneLaGommette);
+            donneLaGommette.setGommette(newGommette);
 
-        return StudentGUI.getAllUsers(true);
+            Date date = new Date();
+            donneLaGommette.setDate(date);
+
+            donneLaGommette.setId_prof(id_prof);
+
+            StudentCore.addGommette(donneLaGommette);
+            return true;
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
     }
 
     public static Object modifyGommette(String gomColour, String gomDescription, String gommetteId, String studentId) throws TemplateException, IOException {

@@ -1,14 +1,15 @@
 import './App.css';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   BrowserRouter as Router,
   Routes,
-  Route,
+  Route
 } from "react-router-dom";
 
 // my modules
 import NavBar from './pages/elements/Navbar';
 import Students from './pages/Students';
+import Student from './pages/Student';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import PageNotFound from './pages/PageNotFound';
@@ -18,6 +19,15 @@ function App() {
 
   const [auth, setAuth] = useState({});
 
+  useEffect(() => {
+    console.log("AUTH: " + auth);
+    if (localStorage.getItem('user') !== null) {
+      setAuth(true);
+    } else {
+      setAuth(false);
+    }
+  }, []);
+
 
   return (
     <div className="App">
@@ -25,11 +35,15 @@ function App() {
       <Router>
         <NavBar />
         <Routes>
-          <Route path="/" element={<Students/>}/>
-          <Route path="/students" element={<Students/>}/>
+          <Route path="/" element={<Students auth={auth}/>}/>
+          <Route path="/students" element={<Students auth={auth}/>}/>
+
+
+          <Route path="/students/:id" element={<Student auth={auth}/>}/>
+
           
           <Route path="/login" element={<Login setAuth={setAuth} />}/>
-          <Route path="/register" element={<Register/>}/>
+          <Route path="/register" element={<Register setAuth={setAuth}/>}/>
 
           <Route path="*" element={<PageNotFound/>}/>
         </Routes>

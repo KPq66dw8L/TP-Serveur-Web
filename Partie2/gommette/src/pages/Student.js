@@ -1,113 +1,89 @@
+import React, {useEffect, useState} from "react";
+import {
+  useParams
+} from "react-router-dom";
 
+import EasyHTTP from './elements/EasyHTTP';
+
+const http = new EasyHTTP();
 
 export default function Student() {
 
+    let { id } = useParams(); // get the id from the url parameter
+    let [user, setUser] = useState({});
+    let [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        http.get('http://localhost:8081/users/'+ id)
+        .then(data =>{ 
+            setUser(data);
+            setLoaded(true);
+        })
+        // Resolving promise for error
+        .catch(err => console.log(err));
+    }, [id, user.id]); // !!!!!! avoid using objects as dependencies, here object.prop = GOOD
+    // https://dmitripavlutin.com/react-useeffect-infinite-loop/#21-avoid-objects-as-dependencies
+
     return (
         <div>
+            {loaded ? <InfosStudent user={user} /> : <Waiting />}
+        </div>);
+}
 
+function Waiting() {
+    return (
+        <div>
+            <h1>Loading...</h1>
+        </div>
+    );
+}
 
-    <h1>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}</h1>
+function InfosStudent({user}) {
 
+    console.log(user);
 
-
-        <h2>${user.getNb_white()} gommettes white</h2>
-        <ul><#list gommetteWhite>
-
-            <div>
-                <#items as gommete1>
-                    <li>White. Description: ${gommete1.getGommette().getDescription()} Date: ${gommete1.getDate()}. Prof id: ${gommete1.getId_prof()} <a data-gommette-id="http://localhost:8081/gommette/${gommete1.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></li>
-
-                    <form style="display: none;" id="modify-form">
-                        <select name="gommette" id="gommette">
-                            <option value="white">White</option>
-                            {/* <#if gommete1.getGommette().getColour() == "green">
-                                <option selected="selected" value="green">Green</option>
-                            <#else>
-                                <option value="green">Green</option>
-                            </#if>
-
-                            <#if gommete1.getGommette().getColour() == "red">
-                                <option selected="selected" value="red">Red</option>
-                            <#else>
-                                <option value="red">Red</option>
-                            </#if> */}
-                        </select>
-                        <input required type="text" name="description" value="${gommete1.getGommette().getDescription()}"/>
-                        <input type="hidden" value='${gommete1.getGommette().getId()}' name="gommetteId"/>
-                        <input type="hidden" value='${user.id}' name="studentId"/>
-                        <button type="submit" name="send-modify">Modify gommette</button>
-                    </form>
-
-                </#items>
-            </div>
-
-        </#list></ul>
-
-        <h2>${user.getNb_green()} gommettes green</h2>
-        <ul><#list gommetteGreen>
-
-            <div>
-                <#items as gommete2>
-                    <li>Green. Description: ${gommete2.getGommette().getDescription()} Date: ${gommete2.getDate()}. Prof id: ${gommete2.getId_prof()} <a data-gommette-id="http://localhost:8081/gommette/${gommete2.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></li>
-
-                        <form style="display: none;" id="modify-form">
-                            <select name="gommette" >
-                                <option value="white">White</option>
-                                {/* <#if gommete2.getGommette().getColour() == "green">
-                                    <option selected="selected" value="green">Green</option>
-                                <#else>
-                                    <option value="green">Green</option>
-                                </#if>
-
-                                <#if gommete2.getGommette().getColour() == "red">
-                                    <option selected="selected" value="red">Red</option>
-                                <#else>
-                                    <option value="red">Red</option>
-                                </#if> */}
-                            </select>
-                            <input required type="text" name="description" value="${gommete2.getGommette().getDescription()}"/>
-                            <input type="hidden" value='${gommete2.getGommette().getId()}' name="gommetteId"/>
-                            <input type="hidden" value='${user.id}' name="studentId"/>
-                            <button type="submit" name="send-modify">Modify gommette</button>
-                        </form>
-
-                </#items>
-            </div>
-
-        </#list></ul>
-
-        <h2>${user.getNb_red()} gommettes red</h2>
-        <ul><#list gommetteRed>
-
-            <div>
-                <#items as gommete3>
-                    <li>Red. Description: ${gommete3.getGommette().getDescription()}. Date: ${gommete3.getDate()}. Prof id: ${gommete3.getId_prof()} <a data-gommette-id="http://localhost:8081/gommette/${gommete3.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></li>
-                    <form style="display: none;" id="modify-form">
-                            <select name="gommette" >
-                                <option value="white">White</option>
-                                {/* <#if gommete3.getGommette().getColour() == "green">
-                                    <option selected="selected" value="green">Green</option>
-                                <#else>
-                                    <option value="green">Green</option>
-                                </#if>
-
-                                <#if gommete3.getGommette().getColour() == "red">
-                                    <option selected="selected" value="red">Red</option>
-                                <#else>
-                                    <option value="red">Red</option>
-                                </#if> */}
-                            </select>
-                            <input required type="text" name="description" value="${gommete3.getGommette().getDescription()}"/>
-                            <input type="hidden" value='${gommete3.getGommette().getId()}' name="gommetteId"/>
-                            <input type="hidden" value='${user.id}' name="studentId"/>
-                            <button type="submit" name="send-modify">Modify gommette</button>
-                        </form>
-                </#items>
-            </div>
-
-        </#list></ul>
+    return (
+        <div>
+            <h1>{user.id} - {user.firstName} {user.lastName} in {user.group}</h1>
+            <h1>Whites</h1>
+            <ul>
+                {user.gommettes.white.map(gommette => {
+                    return (
+                        <GommettesPerColour gommette={gommette} key={gommette.id} />
+                    );
+                })}
+            </ul>
+            <h1>Greens</h1>
+            <ul>
+                {user.gommettes.green.map(gommette => {
+                    return (
+                        <GommettesPerColour gommette={gommette} key={gommette.id + 1} />
+                    );
+                })}
+            </ul>
+            <h1>Reds</h1>
+            <ul>
+                {user.gommettes.red.map(gommette => {
+                    return (
+                        <GommettesPerColour gommette={gommette} key={gommette.id + 2} />
+                    );
+                })}
+            </ul>
 
 
         </div>
+    );
+}
+
+function GommettesPerColour({gommette}) {
+
+    return (
+        <li>
+            Colour: {gommette.colour}.
+            Description: {gommette.description}.
+            Date: {gommette.date}.
+            Prof id: {gommette.prof}.
+            {/* <a data-gommette-id="http://localhost:8081/gommette/${gommette.id}/delete" href="#" id="delete-gommette">Delete gommette</a> */}
+        </li>
     );
 }

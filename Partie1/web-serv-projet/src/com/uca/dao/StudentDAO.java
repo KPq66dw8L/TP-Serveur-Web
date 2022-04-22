@@ -170,7 +170,7 @@ public class StudentDAO extends _Generic<StudentEntity> {
             statement.executeUpdate();
 
             /*
-             * Get the last gommette's (the one we just created) id. We need to retrieve it because the id is created in the db.
+             * Get the last gommette id (the one we just created). We need to retrieve it because the id is created in the db.
              * But we need it for the creation of the new givenGommetes.
              **/
             statement = this.connect.prepareStatement("SELECT * FROM gommettes WHERE id=(SELECT MAX(id) FROM gommettes);");
@@ -179,8 +179,6 @@ public class StudentDAO extends _Generic<StudentEntity> {
             // Even though the request only returns one result, we need the following while loop
             while (resultSet.next()){
                 try {
-//            System.out.println("Oeeeeee" + resultSet.getInt(1));
-//            System.out.println("ID=====: " + resultSet.getInt("id"));
                     id_gommette = resultSet.getInt("id");
 //                    System.out.println("id gommette: " + id_gommette);
                 } catch (SQLException e){
@@ -206,7 +204,6 @@ public class StudentDAO extends _Generic<StudentEntity> {
 
         } catch (SQLException e){
             e.printStackTrace();
-//            System.out.println("Raté");
         }
     }
 

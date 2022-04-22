@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import EasyHTTP from './elements/EasyHTTP';
 
@@ -26,13 +26,22 @@ function createProfHandler(e, firstName, lastName, username, password) {
     }
 }
 
-export default function Register() {
+export default function Register({setAuth}) {
 
     const [firstName, setFirstName] = useState("");
     const [lastname, setLastName] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const [msg, setMsg] = useState("");
+
+    useEffect(() => {
+        if (localStorage.getItem('user') !== null) {
+            setAuth(true);
+            setMsg("Bienvenue " + localStorage.getItem('user').split(';')[0] + ". Vous êtes déjà connecté");
+            document.getElementById('register-form').innerHTML = "";
+        }
+    },[]);
 
     return (
         <div>
@@ -50,6 +59,8 @@ export default function Register() {
                 <input type='text' name='password' placeholder="password" onChange={(e) => setPassword(e.target.value)}/>
             <button onClick={(e) => createProfHandler(e, firstName, lastname, username, password)} >Create prof</button>
             </form>
+
+            <h1>{msg}</h1>
         </div>
     );
 }

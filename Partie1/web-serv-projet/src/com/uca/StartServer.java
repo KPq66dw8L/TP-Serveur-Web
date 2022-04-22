@@ -66,7 +66,10 @@ public class StartServer {
         get("/users/:id", (req, res) -> {
             String id = req.params(":id");
 
-            return StudentGUI.getUser(id);
+            String infosStu = StudentGUI.getUser(id);
+            res.body(infosStu);
+
+            return res.body();
         });
 
         /*
@@ -122,36 +125,21 @@ public class StartServer {
         post("/login", (req, res) -> {
 
             String tmpProf = ProfGUI.login(req.body());
-//            res.header("user", tmpProf);
             res.body(tmpProf);
             if (tmpProf == null) {
                 res.status(401);
+                return res;
             }
             System.out.println(res.body());
-            return res;
+            return res.body(); // problem -> no header in the response sent. If sending whole res, don't know how to read 'spark.Response@42c86cfd' in Frontend
         });
 
         /*
          * Add a gommette to a user
          **/
-        put("/users", (req, res) -> {
+        put("/users/:hashedPwd", (req, res) -> {
 
-
-            Gommette gomTmp = null;
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                /*
-                 * JSON from String to Object.
-                 * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
-                 * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
-                 **/
-                gomTmp = mapper.readValue(req.body(), Gommette.class);
-            } catch ( Exception e ) {
-                System.out.println(e);
-            }
-
-
-
+            String hashedPwd = req.params(":hashedPwd");
 
 //            String tmp = req.body().replaceAll("\"", "");
 //            // a l'ancienne
@@ -162,7 +150,7 @@ public class StartServer {
 //                System.out.println(e);
 //            }
 
-            String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
+//            String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
 
             //need authentificate()
 //            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
@@ -184,17 +172,19 @@ public class StartServer {
 
 //            return StudentGUI.addGommette(formParts[0], formParts[1], formParts[2], currentProf.getId());
 
-
-
-
-//            StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), currentProf.getId());
+            boolean tmp = StudentGUI.addGommette(req.body(), hashedPwd);
+            if (!tmp) {
+                res.status(500);
+            } else {
+                res.status(201);
+            }
             return res;
         });
 
         /*
          * Modify a specific gommette
          **/
-        put("/users/:id", (req, res) -> {
+        put("/users/:id/gommette", (req, res) -> {
 //            String tmp = req.body().replaceAll("\"", "");
 //
 //            String[] formParts = null;
