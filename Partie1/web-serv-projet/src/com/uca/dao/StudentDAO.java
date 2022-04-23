@@ -17,19 +17,14 @@ import static java.lang.Integer.parseInt;
  **/
 public class StudentDAO extends _Generic<StudentEntity> {
 
-    /*
-     * Retrieve all students and all gommettes to be able to restore every student it's gommettes.
-     * Return only the list of students.
-     **/
+    // Retrieve all students with all their gommettes.
     public ArrayList<StudentEntity> getAllUsers() {
-        ArrayList<StudentEntity> entities = new ArrayList<>(); //arrayList of students
-        ArrayList<Gommette> goms = new ArrayList<>(); //arrayList of gommettes
+        ArrayList<StudentEntity> entities = new ArrayList<>();
+        ArrayList<Gommette> goms = new ArrayList<>();
         int id_gommette_buffer;
 
         try {
-            /*
-             * Retrieve all students
-             **/
+            // Retrieve all students
             PreparedStatement preparedStatement = this.connect.prepareStatement("SELECT * FROM students ORDER BY id ASC;");
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -39,13 +34,9 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 entity.setLastName(resultSet.getString("lastname"));
                 entity.setGroup(resultSet.getString("department"));
 
-//                System.out.println("getAllUser DAO 1: " + entity.getFirstName());
-
                 entities.add(entity);
             }
-            /*
-             * Retrieve all gommettes
-             **/
+            // Retrieve all gommettes
             preparedStatement = this.connect.prepareStatement("SELECT * FROM gommettes ORDER BY id ASC;");
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -54,14 +45,10 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 entityGommette.setColour(resultSet.getString("colour"));
                 entityGommette.setDescription(resultSet.getString("description"));
 
-//                System.out.println("getAllUser DAO 2: " + entityGommette.getColour());
-
                 goms.add(entityGommette);
             }
 
-            /*
-             * Retrieve all givenGommettes
-             **/
+            // Retrieve all givenGommettes
             preparedStatement = this.connect.prepareStatement("SELECT * FROM givenGommettes ORDER BY id ASC;");
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -71,11 +58,6 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 entityGivenGommettes.setId_prof(resultSet.getInt("id_prof"));
                 id_gommette_buffer = resultSet.getInt("id_gommette");
                 entityGivenGommettes.setDate(resultSet.getString("gommetteDate"));
-//                System.out.println("getAllUser DAO 3.1: " + resultSet.getInt("id"));
-//                System.out.println("getAllUser DAO 3.2: " + resultSet.getInt("id_student"));
-//                System.out.println("getAllUser DAO 3.3: " + resultSet.getInt("id_prof"));
-//                System.out.println("getAllUser DAO 3.4: " + id_gommette_buffer);
-//                System.out.println("getAllUser DAO 3.5: " + resultSet.getString("gommetteDate"));
 
                 /*
                  * Using the id_gommette_buffer (used in db to link givenGommettes and gommettes) to link the gommette to a student's givenGommet list.
@@ -84,25 +66,17 @@ public class StudentDAO extends _Generic<StudentEntity> {
                 for (Gommette tmpGom : goms){
                     if (tmpGom.getId() == id_gommette_buffer){
                         entityGivenGommettes.setGommette(tmpGom);
-//                        System.out.println("getAllUser DAO CHECK 1");
                     }
                 }
 
-                /*
-                 * Give every student it's own GivenGommettes list
-                 **/
+                // Give every student it's own GivenGommettes list
                 for (StudentEntity tmpStudent : entities){
-//                    System.out.println("getAllUser DAO CHECK ULTIME: " + entityGivenGommettes.getId_student() + " & " + tmpStudent.getId());
-//                    System.out.println(entityGivenGommettes.getId_student() == tmpStudent.getId());
                     if (entityGivenGommettes.getId_student() == tmpStudent.getId()){
                         tmpStudent.addGommete(entityGivenGommettes);
-//                        System.out.println("getAllUser DAO CHECK 2");
                     }
                 }
 
-                /*
-                 * Feed the global GivenGommetes list, containing every given gommettes.
-                 **/
+                // Feed the global GivenGommetes list, containing every given gommettes.
                 StudentEntity.everyGommettes.add(entityGivenGommettes);
             }
 
@@ -113,9 +87,7 @@ public class StudentDAO extends _Generic<StudentEntity> {
         return entities;
     }
 
-    /*
-     * Handle the creation of a new student in the db.
-     **/
+    // Handle the creation of a new student in the db.
     @Override
     public StudentEntity create(StudentEntity obj) throws SQLException {
         try {
@@ -155,14 +127,10 @@ public class StudentDAO extends _Generic<StudentEntity> {
         }
     }
 
-    /*
-     * Handle the addition of gommette to a student.
-     **/
+    // Handle the addition of gommette to a student.
     public void addGommette(GivenGommettes addedGommette){
         try {
-            /*
-             * Create a new gommette
-             **/
+            // Create a new gommette in the db
             PreparedStatement statement;
             statement = this.connect.prepareStatement("INSERT INTO gommettes(colour, description) VALUES(?, ?);");
             statement.setString(1, addedGommette.getGommette().getColour());
@@ -170,37 +138,29 @@ public class StudentDAO extends _Generic<StudentEntity> {
             statement.executeUpdate();
 
             /*
-             * Get the last gommette id (the one we just created). We need to retrieve it because the id is created in the db.
+             * Get the last gommette id (the one we just created). We need to retrieve it because the 'id' is created in the db.
              * But we need it for the creation of the new givenGommetes.
              **/
             statement = this.connect.prepareStatement("SELECT * FROM gommettes WHERE id=(SELECT MAX(id) FROM gommettes);");
             ResultSet resultSet = statement.executeQuery();
             int id_gommette = 0;
-            // Even though the request only returns one result, we need the following while loop
+            // Even though the SQL request only returns one result, we need the following while loop
             while (resultSet.next()){
                 try {
                     id_gommette = resultSet.getInt("id");
-//                    System.out.println("id gommette: " + id_gommette);
                 } catch (SQLException e){
                     e.printStackTrace();
                 }
             }
 
-            /*
-             * Create the new givenGommettes in the db
-             **/
+            // Create the new givenGommettes in the db
             statement = this.connect.prepareStatement("INSERT INTO givenGommettes(id_student, id_prof, id_gommette, gommetteDate) VALUES(?, ?, ?, ?);");
-//            System.out.println("addGommete DAO 1: " + addedGommette.getId_student());
-//            System.out.println("addGommete DAO 2: " + addedGommette.getId_prof());
-//            System.out.println("addGommete DAO 3: " + id_gommette);
-//            System.out.println("addGommete DAO 4: " + addedGommette.getDate());
 
             statement.setInt(1, addedGommette.getId_student());
             statement.setInt(2, addedGommette.getId_prof());
             statement.setInt(3, id_gommette);
             statement.setString(4, addedGommette.getDate());
             statement.executeUpdate();
-//            System.out.println("addGommette dans StudentDAO ACTION !!");
 
         } catch (SQLException e){
             e.printStackTrace();
@@ -217,8 +177,7 @@ public class StudentDAO extends _Generic<StudentEntity> {
             statement.setInt(3, gommetteId);
             statement.executeUpdate();
         } catch (SQLException e){
-            //e.printStackTrace();
-            System.out.println(gommetteId + " " + newColour + " " + newDescription);
+            e.printStackTrace();
         }
     }
 

@@ -1,6 +1,5 @@
 package com.uca.gui;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -11,20 +10,11 @@ import com.uca.entity.GivenGommettes;
 import com.uca.entity.Gommette;
 import com.uca.entity.ProfEntity;
 import com.uca.entity.StudentEntity;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static java.lang.Integer.parseInt;
-
 
 /*
  * ***
@@ -33,17 +23,14 @@ import static java.lang.Integer.parseInt;
  **/
 public class StudentGUI {
 
-    /*
-     * List all students and tell the template of user is logged in from the cookie "user"
-     **/
-    public static String getAllUsers(boolean logged) throws IOException, TemplateException {
+    // Return the json containing every student infos
+    public static String getAllUsers() {
 
         ArrayList<StudentEntity> students = StudentCore.getAllUsers();
-        String json = new String();
+        String json = "";
         try {
             // create `ObjectMapper` instance
             ObjectMapper mapper = new ObjectMapper();
-
             // create `ArrayNode` object
             ArrayNode arrayNode = mapper.createArrayNode();
 
@@ -58,12 +45,11 @@ public class StudentGUI {
                 user.put("green", student.getNb_green());
                 user.put("red", student.getNb_red());
 
-                // add JSON users to array
-                arrayNode.addAll(Arrays.asList(user));
+                // add each JSON student to array
+                arrayNode.addAll(List.of(user));
             }
 
             // convert `ArrayNode` to pretty-print JSON
-            // without pretty-print, use `arrayNode.toString()` method
             json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arrayNode);
 
         } catch (Exception ex) {
@@ -73,15 +59,14 @@ public class StudentGUI {
         return json;
     }
 
-    public static String getUser(String idStudent) throws IOException, TemplateException {
+    public static String getUser(String idStudent) {
 
         // TODO : try catch : if the id does not correspond to any student?
 
-
         StudentEntity student = null;
-        String json = new String();
+        String json = "";
 
-        // on recup l'etudiant
+        // on récupère l'étudiant
         for (StudentEntity stu : StudentCore.getAllUsers()) {
             if (stu.getId() == Integer.parseInt(idStudent)) {
                 student = stu;
@@ -160,14 +145,10 @@ public class StudentGUI {
              **/
             tmpStu = mapper.readValue(newStudent, StudentEntity.class);
         } catch ( Exception e ) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
-        if (StudentCore.create(tmpStu) != null) {
-            return false;
-        }
-
-        return true;
+        return StudentCore.create(tmpStu) == null;
     }
 
     public static String delete(String idStudent) throws SQLException, TemplateException, IOException {
@@ -192,14 +173,14 @@ public class StudentGUI {
         }
 
         StudentCore.delete(id, gommettes_id);
-        return StudentGUI.getAllUsers(true);
+        return StudentGUI.getAllUsers();
     }
 
     /*
      * Handle the creation of a new Gommette + a new GivenGommette. Also call the necessary function to create everything in the db.
      * Return the list of students updated, with the logged-in parameter as one already need to be logged to be able to manipulate gommettes.
      **/
-    public static boolean addGommette(String body, String hashedPwd) throws TemplateException, IOException {
+    public static boolean addGommette(String body, String hashedPwd) {
 
         Integer id_prof = null;
         // Get the prof who gave the gommette
@@ -213,7 +194,7 @@ public class StudentGUI {
         }
 
         // Set the gommette colour & description and the student's id in a temporary object, form the JSON received
-        Gommette gomTmp = null;
+        Gommette gomTmp;
         ObjectMapper mapper = new ObjectMapper();
         try {
             /*
@@ -223,7 +204,7 @@ public class StudentGUI {
              **/
             gomTmp = mapper.readValue(body, Gommette.class);
         } catch ( Exception e ) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
 
@@ -246,26 +227,35 @@ public class StudentGUI {
             StudentCore.addGommette(donneLaGommette);
             return true;
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
     }
 
-    public static Object modifyGommette(String gomColour, String gomDescription, String gommetteId, String studentId) throws TemplateException, IOException {
+    public static void modifyGommette(String reqBody, String studentId){
 
-        StudentCore.modifyGommette(Integer.parseInt(gommetteId), gomColour, gomDescription);
+        Gommette gomTmp = null;
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            /*
+             * JSON from String to Object.
+             * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
+             * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
+             **/
+            gomTmp = mapper.readValue(reqBody, Gommette.class);
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
 
-        return StudentGUI.getUser(studentId);
+        StudentCore.modifyGommette(gomTmp.getId(), gomTmp.getColour(), gomTmp.getDescription());
 
+        StudentGUI.getUser(studentId);
     }
 
-    public static Object deleteGommette(String idGommette) throws TemplateException, IOException {
+    public static Object deleteGommette(String idGommette) {
 
         int id = Integer.parseInt(idGommette);
-
         StudentCore.deleteGommette(id);
-
-
-        return StudentGUI.getAllUsers(true);
+        return StudentGUI.getAllUsers();
     }
 }

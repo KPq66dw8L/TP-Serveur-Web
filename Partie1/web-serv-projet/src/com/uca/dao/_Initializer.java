@@ -15,7 +15,6 @@ public class _Initializer {
 //
 //            statement = connection.prepareStatement("DROP TABLE students;");
 //            statement.executeUpdate();
-            //department = class
             statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS students (" +
                     "id int primary key auto_increment, " +
                     "firstname varchar(100), " +
@@ -68,7 +67,7 @@ public class _Initializer {
 
 
         } catch (Exception e){
-            System.out.println(e.toString());
+            e.printStackTrace();
             throw new RuntimeException("could not create database !");
         }
     }

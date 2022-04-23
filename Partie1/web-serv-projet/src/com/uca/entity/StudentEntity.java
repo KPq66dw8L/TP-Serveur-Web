@@ -28,28 +28,25 @@ public class StudentEntity extends UserEntity {
 
     public void addGommete(GivenGommettes gom){
 
-        if (gom.getGommette().getColour().equals("white")){
-//            System.out.println("white added in entity 1");
-            this.nb_white++;
-//            System.out.println("white added in entity 2");
-            //try-catch because gommettes was not initialized...
-            try {
-                gommettes.add(gom);
-            } catch (Exception e){
-                System.out.println(e);
+        switch (gom.getGommette().getColour()) {
+            case "white" -> {
+                this.nb_white++;
+                try {
+                    gommettes.add(gom);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-//            System.out.println("white added in entity 3");
-        } else if (gom.getGommette().getColour().equals("green")){
-            this.nb_green++;
-            gommettes.add(gom);
-        } else if (gom.getGommette().getColour().equals("red")){
-            this.nb_red++;
-            gommettes.add(gom);
-        } else {
-            System.out.println("Gommette colour invalid.");
+            case "green" -> {
+                this.nb_green++;
+                gommettes.add(gom);
+            }
+            case "red" -> {
+                this.nb_red++;
+                gommettes.add(gom);
+            }
+            default -> System.out.println("Gommette colour invalid.");
         }
-
-//        System.out.println("gommette added in entity");
     }
 
     public String getNb_white() {

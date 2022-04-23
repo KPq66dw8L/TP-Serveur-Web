@@ -2,27 +2,15 @@ package com.uca.gui;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.uca.core.ProfCore;
-import com.uca.core.StudentCore;
 import com.uca.entity.ProfEntity;
-import com.uca.entity.StudentEntity;
-import com.uca.entity.UserEntity;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 
 /*
  * ***
@@ -31,30 +19,22 @@ import java.util.Map;
  **/
 public class ProfGUI {
 
-    /*
-     * Return all profs. Send infos to FreeMarker that parses and use HashMap, and return the page as a string
-     **/
-    public static String getAllUsers() throws IOException, TemplateException {
-        Configuration configuration = _FreeMarkerInitializer.getContext();
+//    public static String getAllUsers() throws IOException, TemplateException {
+//        Configuration configuration = _FreeMarkerInitializer.getContext();
+//
+//        Map<String, Object> input = new HashMap<>();
+//
+//        input.put("users", ProfCore.getAllUsers());
+//
+//        Writer output = new StringWriter();
+//        Template template = configuration.getTemplate("users/register.ftl");
+//        template.setOutputEncoding("UTF-8");
+//        template.process(input, output);
+//        return output.toString();
+//    }
 
-        /*
-         * 1 call in .ftl = 1 obj in Java, with the HashMap
-         **/
-        Map<String, Object> input = new HashMap<>();
-
-        input.put("users", ProfCore.getAllUsers());
-
-        Writer output = new StringWriter();
-        Template template = configuration.getTemplate("users/register.ftl");
-        template.setOutputEncoding("UTF-8");
-        template.process(input, output);
-        return output.toString();
-    }
-
-    /*
-     * Handle part of the registration of a prof = create a new prof entity, and return the list of profs afterwards
-     **/
-    public static String create(String body) throws SQLException, IOException, TemplateException {
+    // Handle part of the registration of a prof => create a new JAVA ProfEntity
+    public static void create(String body) throws SQLException, IOException, TemplateException {
 
         ProfEntity currentProf  = new ProfEntity();
 
@@ -68,41 +48,34 @@ public class ProfGUI {
              **/
             currentProf = mapper.readValue(body, ProfEntity.class);
         } catch ( Exception e ) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         String tmpSalt = BCrypt.gensalt();
         currentProf.setSalt(tmpSalt);
-        String tmpHsPwd = BCrypt.hashpw(currentProf.getHashedPassword(), tmpSalt); // gotta call it hashedPassword in the json, even though it will not be hashed at first
+        String tmpHsPwd = BCrypt.hashpw(currentProf.getHashedPassword(), tmpSalt); // got to call it hashedPassword in the json, even though it will not be hashed at first
 
         currentProf.setHashedPassword(tmpHsPwd);
 
-        currentProf = ProfCore.create(currentProf);
+        ProfCore.create(currentProf);
 
-        return "cool";
     }
 
-    /*
-     * Handle login = check if user exists in db and if so, write it in cookie "user"
-     **/
-    public static String login(String body) throws TemplateException, IOException {
+    // Handle login => check if user exists in the list of all Profs
+    public static String login(String body){
 
         ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
 
         ProfEntity currentProf  = new ProfEntity();
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); // ignore if attribute of the currentProf instance are not filled
         try {
-            /*
-             * JSON from String to Object.
-             * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
-             * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
-             **/
+            // JSON from String to Object.
             currentProf = mapper.readValue(body, ProfEntity.class);
 
         } catch ( Exception e ) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         for (ProfEntity prof : profs){
@@ -112,7 +85,7 @@ public class ProfGUI {
             if (tmp1.equals(tmp2)){
                 currentProf = prof;
 
-                String json = new String();
+                String json = "";
                 try {
                     // create `ObjectMapper` instance
                     ObjectMapper mapper2 = new ObjectMapper();
@@ -126,11 +99,7 @@ public class ProfGUI {
                     user.put("hashedPassword", currentProf.getHashedPassword());
 
                     // convert `ObjectNode` to pretty-print JSON
-                    // without pretty-print, use `user.toString()` method
                     json = mapper2.writerWithDefaultPrettyPrinter().writeValueAsString(user);
-
-                    // print json
-                    System.out.println(json);
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -142,14 +111,5 @@ public class ProfGUI {
         return null;
     }
 
-    /*
-     * OUTDATED
-     **/
-    public static String delete(String firstname, String lastname) throws SQLException, TemplateException, IOException {
 
-        ProfEntity obj = new ProfEntity();
-
-        ProfCore.delete(obj);
-        return ProfGUI.getAllUsers();
-    }
 }

@@ -1,7 +1,6 @@
 package com.uca.dao;
 
 import com.uca.entity.ProfEntity;
-import com.uca.entity.StudentEntity;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,9 +14,7 @@ import java.util.ArrayList;
  **/
 public class ProfDAO extends _Generic<ProfEntity> {
 
-    /*
-     * Retrieve the list of all profs from the db.
-     **/
+    // Retrieve the list of all profs from the db.
     public ArrayList<ProfEntity> getAllUsers() {
         ArrayList<ProfEntity> entities = new ArrayList<>();
         try {
@@ -33,9 +30,7 @@ public class ProfDAO extends _Generic<ProfEntity> {
                 entity.setSalt(resultSet.getString("salt"));
                 entity.setHashedPassword(resultSet.getString("hashedPassword"));
 
-
                 entities.add(entity);
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -44,12 +39,9 @@ public class ProfDAO extends _Generic<ProfEntity> {
         return entities;
     }
 
-    /*
-     * Create a new prof in the db.
-     **/
+    // Create a new prof in the db.
     @Override
     public ProfEntity create(ProfEntity obj) throws SQLException {
-        //TODO !
         try {
             PreparedStatement statement;
             statement = this.connect.prepareStatement("INSERT INTO profs(firstname, lastname, username, salt, hashedPassword) VALUES(?, ?, ?, ? , ?);");
@@ -67,6 +59,7 @@ public class ProfDAO extends _Generic<ProfEntity> {
         return null;
     }
 
+    // TODO ?
     @Override
     public void delete(int id, ArrayList<Integer> gommettes_id) throws SQLException {
 
