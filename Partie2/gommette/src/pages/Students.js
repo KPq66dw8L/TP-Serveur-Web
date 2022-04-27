@@ -16,7 +16,7 @@ const http = new EasyHTTP();
 function addStudentHandler(e, firstName, lastName, group, studentsLen, setStudentsLen) {
     e.preventDefault();
     if (firstName !== "" && lastName !== "" && group !== "") {
-        http.post('http://localhost:8081/users', {
+        http.post('http://localhost:8081/protected/users', {
             firstName: firstName,
             lastName: lastName,
             group: group
@@ -31,9 +31,9 @@ function addStudentHandler(e, firstName, lastName, group, studentsLen, setStuden
     }
 }
 
-function deleteGommetteHandler(e, user, studentsLen, setStudentsLen) {
+function deleteStudentHandler(e, user, studentsLen, setStudentsLen) {
     e.preventDefault();
-    let link = "http://localhost:8081/users/"+user.id+"/delete";
+    let link = "http://localhost:8081/protected/users/"+user.id+"/delete";
     http.delete(link)
     .then(data => {
         console.log(data); 
@@ -44,8 +44,9 @@ function deleteGommetteHandler(e, user, studentsLen, setStudentsLen) {
 
 function addGommetteHandler(e, user, gommetteColour, gommetteDescription, studentsLen, setStudentsLen) {
     e.preventDefault();
-    
-    http.put(`http://localhost:8081/users/${localStorage.getItem('user').split(';')[1]}`, {
+    let prof = JSON.parse(localStorage.getItem('user'));
+    console.log("Adding une gommette..." + prof.id);
+    http.put(`http://localhost:8081/protected/users/${prof.id}`, {
         colour: gommetteColour,
         description: gommetteDescription,
         id: user.id
@@ -71,6 +72,11 @@ export default function Students({auth}) {
     const [stuLastname, setStuLastname] = useState("");
     const [stuGroup, setStuGroup] = useState("");
 
+    let prof = null;
+    if (localStorage.getItem('user') !== null) {
+        prof = JSON.parse(localStorage.getItem('user'));
+    }
+
     // le hook useEffect est appelé à chaque fois que le state du 2eme parametre est modifié, si aucun parametre n'est precisé, 
     // le hook est appelé a chaque changement d'un hook
     useEffect(() => {
@@ -84,16 +90,16 @@ export default function Students({auth}) {
 
     return (
         <div>
-            {auth && <AddStudentForm stuFirstname={stuFirstname} setStuFirstname={setStuFirstname} stuLastname={stuLastname} setStuLastname={setStuLastname} stuGroup={stuGroup} setStuGroup={setStuGroup} studentsLen={studentsLen} setStudentsLen={setStudentsLen} />}
+            {(prof !== null) && <AddStudentForm stuFirstname={stuFirstname} setStuFirstname={setStuFirstname} stuLastname={stuLastname} setStuLastname={setStuLastname} stuGroup={stuGroup} setStuGroup={setStuGroup} studentsLen={studentsLen} setStudentsLen={setStudentsLen} />}
             <ul>
                 {students.map((user) => (
                     <div key={user.id} className={"user user" + user.id}>
                         {/* <a href={"http://localhost:8081/users/" + user.id}>{user.firstName} {user.lastName}</a> */}
                         <li>{user.id} - <Link to={`/students/${user.id}`}>{user.firstName} {user.lastName}</Link>  in {user.group}, Gommettes: {user.white}, {user.green}, {user.red} </li>
 
-                        {auth && <DeleteStudent user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen}/>}
+                        {(prof !== null) && <DeleteStudent user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen}/>}
 
-                        {auth && <AddGommetteForm user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen} />}
+                        {(prof !== null) && <AddGommetteForm user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen} />}
                         
                     </div>
                 ))}
@@ -119,7 +125,7 @@ function AddStudentForm({stuFirstname, setStuFirstname, stuLastname, setStuLastn
 }
 
 function DeleteStudent({user, studentsLen, setStudentsLen}){
-    return (<a href="#!" id="delete-student" onClick={(e) => deleteGommetteHandler(e, user, studentsLen, setStudentsLen)}>Delete student</a>);
+    return (<a href="#!" id="delete-student" onClick={(e) => deleteStudentHandler(e, user, studentsLen, setStudentsLen)}>Delete student</a>);
 }
 
 function AddGommetteForm({user, studentsLen, setStudentsLen}) {

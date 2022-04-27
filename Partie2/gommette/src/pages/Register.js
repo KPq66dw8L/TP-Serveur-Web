@@ -28,6 +28,7 @@ function createProfHandler(e, firstName, lastName, username, password) {
 
 export default function Register({setAuth}) {
 
+    const [profs, setProfs] = useState([]);
     const [firstName, setFirstName] = useState("");
     const [lastname, setLastName] = useState("");
     const [username, setUsername] = useState("");
@@ -35,22 +36,28 @@ export default function Register({setAuth}) {
 
     const [msg, setMsg] = useState("");
 
+    let tmp = 0;
+
+    useEffect(() => {
+        http.get('http://localhost:8081/register')
+        .then(data => {
+            setProfs(data);
+        })
+        // Resolving promise for error
+        .catch(err => console.log(err));
+    }, [])
+
     useEffect(() => {
         if (localStorage.getItem('user') !== null) {
-            setAuth(true);
-            setMsg("Bienvenue " + localStorage.getItem('user').split(';')[0] + ". Vous êtes déjà connecté");
+            setMsg("Bienvenue. Vous êtes déjà connecté");
             document.getElementById('register-form').innerHTML = "";
+            tmp ++;
         }
-    },[]);
+    },[tmp]);
 
     return (
         <div>
             <h1>Register</h1>
-            <ul>
-                {/* <#list users as user>
-                    <li>{user.id} - {user.firstName} {user.lastName} aka {user.username} shhhh: {user.salt} {user.hashedPassword} </li>
-                </#list> */}
-            </ul>
 
             <form method='post' encType='multipart/form-data' id='register-form'>
                 <input type='text' name='firstname' placeholder="firstname" onChange={(e) => setFirstName(e.target.value)}/>
@@ -61,6 +68,17 @@ export default function Register({setAuth}) {
             </form>
 
             <h1>{msg}</h1>
+
+            <div>
+                <h1>List of profs registered</h1>
+                <ul>
+                    {profs.map(prof => { 
+                        return (
+                            <li key={prof.id}>{prof.firstName} {prof.lastName} aka {prof.username}. Id: {prof.id}</li>
+                        );
+                    })} 
+                </ul>
+            </div>
         </div>
     );
 }

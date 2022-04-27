@@ -20,12 +20,9 @@ function App() {
   const [auth, setAuth] = useState({});
 
   useEffect(() => {
-    console.log("AUTH: " + auth);
-    if (localStorage.getItem('user') !== null) {
-      setAuth(true);
-    } else {
-      setAuth(false);
-    }
+    setAuth(JSON.parse(localStorage.getItem('user')));
+    console.log("AUTH: " + JSON.stringify(auth));
+    
   }, []);
 
 
@@ -38,11 +35,9 @@ function App() {
           <Route path="/" element={<Students auth={auth}/>}/>
           <Route path="/students" element={<Students auth={auth}/>}/>
 
-
           <Route path="/students/:id" element={<Student auth={auth}/>}/>
-
           
-          <Route path="/login" element={<Login setAuth={setAuth} />}/>
+          <Route path="/login" element={<Login setAuth={setAuth} auth={auth} />}/>
           <Route path="/register" element={<Register setAuth={setAuth}/>}/>
 
           <Route path="*" element={<PageNotFound/>}/>

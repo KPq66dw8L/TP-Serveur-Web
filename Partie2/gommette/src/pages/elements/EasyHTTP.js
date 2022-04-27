@@ -24,10 +24,11 @@ class EasyHTTP {
     // Make an HTTP POST Request
     async post(url, data) {
 
-        let str = "";
+        // let str = "";
 
+        let tmp = "";
         if (localStorage.getItem('user') !== null) {
-            str = `Basic ${localStorage.getItem('user')}`;
+            tmp = JSON.parse(localStorage.getItem('user')).token
         }
   
         // Awaiting fetch which contains 
@@ -37,7 +38,7 @@ class EasyHTTP {
             headers: {
                 'Content-type': 'application/json',
                 'Access-Control-Allow-Origin': 'http://localhost:8081',
-                'Authorization': str
+                'Authorization': `${tmp}`
             },
             body: JSON.stringify(data)
         });
@@ -52,15 +53,18 @@ class EasyHTTP {
 
     // Make an HTTP PUT Request
     async put(url, data) {
-  
         // Awaiting fetch which contains 
         // method, headers and content-type
+        let tmp = "";
+        if (localStorage.getItem('user') !== null) {
+            tmp = JSON.parse(localStorage.getItem('user')).token
+        }
         const response = await fetch(url, {
             method: 'PUT',
             headers: {
               'Content-type': 'application/json',
               'Access-Control-Allow-Origin': 'http://localhost:8081',
-              'Authorization': `Basic ${localStorage.getItem('user')}`
+              'Authorization': `${tmp}`
             },
             body: JSON.stringify(data)
         });
@@ -82,7 +86,8 @@ class EasyHTTP {
             method: 'DELETE',
             headers: {
                 'Content-type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://localhost:8081'
+                'Access-Control-Allow-Origin': 'http://localhost:8081',
+                'Authorization': `${JSON.parse(localStorage.getItem('user')).token}`
             }
         });
   
@@ -92,43 +97,6 @@ class EasyHTTP {
         // Return response data 
         return resData;
     }
-
-    
-
-    // private method
-    async #authHeader(url, auth) {
-        
-        // return auth header with jwt if user is logged in and request is to the api url
-        const token = auth?.token;
-        const isLoggedIn = !!token; // The double exclamation point, or double bang, converts a truthy or falsy value to “true” or “false”
-        // const isApiUrl = url.startsWith(process.env.REACT_APP_API_URL);
-        const isApiUrl = url.startsWith("http://localhost:8081");
-        if (isLoggedIn && isApiUrl) {
-            return { Authorization: `Basic ${token}` };
-        } else {
-            return {};
-        }
-    }
-
-    async handleResponse(response, auth, setAuth) {
-        return response.text().then(text => {
-            const data = text && JSON.parse(text);
-            
-            if (!response.ok) {
-                if ([401, 403].includes(response.status) && auth?.token) {
-                    // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
-                    localStorage.removeItem('user');
-                    setAuth(null);
-                    // history.push('/login');
-                }
-    
-                const error = (data && data.message) || response.statusText;
-                return Promise.reject(error);
-            }
-    
-            return data;
-        });
-    }    
 }
 
 export default EasyHTTP;

@@ -9,7 +9,7 @@ import EasyHTTP from './elements/EasyHTTP';
 const http = new EasyHTTP();
 
 function deleteGommetteHandler(id) {
-    let link = "http://localhost:8081/gommette/"+id+"/delete";
+    let link = "http://localhost:8081/protected/gommette/"+id+"/delete";
     http.delete(link)
     .then(data => {
         console.log(data);
@@ -20,8 +20,8 @@ function deleteGommetteHandler(id) {
 
 function modifyGommetteHandler(e, idGommette, gommetteColour, gommetteDescription, idStudent) {
     e.preventDefault();
-
-    http.put(`http://localhost:8081/users/${idStudent}/gommette`, {
+    console.log("Modifying gommette");
+    http.put(`http://localhost:8081/protected/users/${idStudent}/gommette`, {
         colour: gommetteColour,
         description: gommetteDescription,
         id: idGommette
@@ -66,8 +66,6 @@ function Waiting() {
 
 function InfosStudent({user}) {
 
-    console.log(user);
-
     return (
         <div>
             <h1>{user.id} - {user.firstName} {user.lastName} in {user.group}</h1>
@@ -109,6 +107,8 @@ function GommettesPerColour({gommette, idStudent}) {
     const [gommetteColour, setGommetteColour] = useState(gommette.colour);
     const [gommetteDescription, setGommetteDescription] = useState(gommette.description);
 
+    let prof = localStorage.getItem('user');
+
     const options = [
         { value: 'white', label: 'White' },
         { value: 'green', label: 'Green' },
@@ -121,12 +121,13 @@ function GommettesPerColour({gommette, idStudent}) {
             Description: {gommette.description}.
             Date: {gommette.date}.
             Prof id: {gommette.prof}.
-            <button onClick={() => deleteGommetteHandler(gommette.id)}>Delete</button>
-            <button onClick={() => {setModifyGommette(!modifyGommette); modifyGommette ? setMot("End") : setMot("Start");}}>{mot} modifying</button>
+
+            {prof !== null && <button onClick={() => deleteGommetteHandler(gommette.id)}>Delete</button>}
+            {prof !== null && <button onClick={() => { modifyGommette ? setMot("Start") : setMot("End");setModifyGommette(!modifyGommette);}}>{mot} modifying</button>}
 
             { modifyGommette && <form action="">
                 <Select options={options} onChange={(e) => setGommetteColour(e.value)}/>
-                <input required type="text" name="description" placeholder="description" onChange={e => setGommetteDescription(e.target.value)}/>
+                <input required type="text" name="description" placeholder="description" defaultValue={gommette.description} onChange={e => setGommetteDescription(e.target.value)}/>
                 <button type="submit" onClick={(e) => modifyGommetteHandler(e, gommette.id, gommetteColour, gommetteDescription, idStudent)}>Submit modifications</button>
             </form> }
         </li>

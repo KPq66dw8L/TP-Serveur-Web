@@ -1,7 +1,9 @@
 package com.uca.core;
 
+import com.uca.dao.ProfDAO;
 import com.uca.dao.StudentDAO;
 import com.uca.entity.GivenGommettes;
+import com.uca.entity.ProfEntity;
 import com.uca.entity.StudentEntity;
 
 import java.sql.SQLException;
@@ -18,8 +20,9 @@ public class StudentCore {
         return new StudentDAO().getAllUsers();
     }
 
-    public static StudentEntity create(StudentEntity obj) throws SQLException {
-        return new StudentDAO().create(obj);
+    public static boolean create(StudentEntity obj) throws SQLException {
+        boolean check = new StudentDAO().create(obj) != null;
+        return check;
     }
 
     public static void delete(int idStudent, ArrayList<Integer> gommettes_id) throws SQLException {
