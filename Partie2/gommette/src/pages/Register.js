@@ -6,7 +6,7 @@ const http = new EasyHTTP();
 
 function createProfHandler(e, firstName, lastName, username, password) {
     e.preventDefault();
-    // && localStorage.getItem('user') === null
+
     if (firstName !== "" && lastName !== "" && username !== "" && password !== "" ) {
         http.post('http://localhost:8081/register', {
             firstName: firstName,
@@ -15,15 +15,24 @@ function createProfHandler(e, firstName, lastName, username, password) {
             hashedPassword: password
         })
         .then(data => {
-            // setAuth(data);
             console.log(data);
-            // localStorage.setItem('user', data.token);
+            // localStorage.setItem('user', data);
             if (data.status === 200) {
                 document.getElementById('register-form').reset();
             }
         })
         .catch(err => console.log(err));
     }
+}
+
+function deleteProfHandler(idToDel, currentId) {
+
+    http.delete(`http://localhost:8081/protected/register/${currentId}/delete/${idToDel}`)
+    .then(data => {
+        console.log(data);
+        window.location.reload(false); 
+    })
+    .catch(err => console.log(err));
 }
 
 export default function Register({setAuth}) {
@@ -36,7 +45,8 @@ export default function Register({setAuth}) {
 
     const [msg, setMsg] = useState("");
 
-    let tmp = 0;
+    const [count, setCount] = useState(0);
+    const [current_id, setCurrent_id] = useState();
 
     useEffect(() => {
         http.get('http://localhost:8081/register')
@@ -51,9 +61,11 @@ export default function Register({setAuth}) {
         if (localStorage.getItem('user') !== null) {
             setMsg("Bienvenue. Vous êtes déjà connecté");
             document.getElementById('register-form').innerHTML = "";
-            tmp ++;
+            let tmp_user = JSON.parse(localStorage.getItem('user'));
+            setCurrent_id(tmp_user.id);
+            setCount(count + 1);
         }
-    },[tmp]);
+    },[count]);
 
     return (
         <div>
@@ -74,7 +86,7 @@ export default function Register({setAuth}) {
                 <ul>
                     {profs.map(prof => { 
                         return (
-                            <li key={prof.id}>{prof.firstName} {prof.lastName} aka {prof.username}. Id: {prof.id}</li>
+                            <li key={prof.id}>{prof.firstName} {prof.lastName} aka {prof.username}. Id: {prof.id} { ((localStorage.getItem('user') !== null) && prof.id !== current_id) && <button onClick={() => deleteProfHandler(prof.id, current_id)}>Delete</button>}</li>
                         );
                     })} 
                 </ul>

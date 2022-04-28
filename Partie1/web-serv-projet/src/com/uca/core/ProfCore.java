@@ -33,7 +33,7 @@ public class ProfCore {
         /*
         L'utilisateur fourni un username et son mot de passe brut. Cependant, on stocke dans la db les hashed pwd.
         Donc on peut seulement récupérer toutes les entrées avec cet username dans la db. Et on doit donc
-        ensuite ici verifier le mot de passe, ce que l'on peut faire puisque l'on recup aussi le salt ds la db.
+        ensuite verifier le mot de passe ici, ce que l'on peut faire puisque l'on recup aussi le salt ds la db.
         SOLUTION: empecher lors de l'inscription d'utiliser un username deja utilisé.
         * */
         for (ProfEntity prof : profs) {
@@ -44,11 +44,11 @@ public class ProfCore {
         return null;
     }
 
-    public static void delete(ProfEntity obj) throws SQLException {
-        new ProfDAO().delete(0, null); // TODO
+    public static boolean delete(int id, int id_to_del) throws SQLException {
+        if (id != id_to_del) {
+            return new ProfDAO().deleteProf(id_to_del);
+        }
+        return false;
     }
 
-    public static boolean authentificate(String hashedPwd) {
-        return new ProfDAO().authentificate(hashedPwd);
-    }
 }

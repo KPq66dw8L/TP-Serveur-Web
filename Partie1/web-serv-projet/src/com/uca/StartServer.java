@@ -66,6 +66,8 @@ public class StartServer {
 
                 if (doLogin.introspec(request.headers("Authorization")) == null) {
                     halt(401, "You are not welcome here");
+                } else {
+                    System.out.println("Access authorized");
                 }
             }
         });
@@ -298,7 +300,6 @@ public class StartServer {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            System.out.println(json);
             return json;
         });
 
@@ -404,6 +405,17 @@ public class StartServer {
         delete("/protected/gommette/:id/delete", (req, res) -> {
             int id = Integer.parseInt(req.params(":id"));
             StudentCore.deleteGommette(id);
+            return res;
+        });
+
+        // delete a prof
+        delete("/protected/register/:id/delete/:idToDel", (req, res) -> {
+            System.out.println("Deleting prof");
+
+            int id_prof = Integer.parseInt(req.params(":id"));
+            int id_to_del = Integer.parseInt(req.params(":idToDel"));
+
+            ProfCore.delete(id_prof, id_to_del);
             return res;
         });
     }

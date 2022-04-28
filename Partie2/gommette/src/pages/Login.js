@@ -16,7 +16,7 @@ function loginHandler(e, setAuth, username, password, setMsg, auth) {
         .then(data => {
             data.text().then(text => {
                 console.log(text);
-                //localStorage.setItem('user', text); //TODO
+                localStorage.setItem('user', text);
                 text = JSON.parse(text);
                 // setAuth(text);
                 setMsg("Bienvenue " + text.firstName + " " + text.lastName);

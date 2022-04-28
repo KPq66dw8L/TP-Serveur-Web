@@ -41,20 +41,15 @@ public class ProfDAO extends _Generic<ProfEntity> {
 
     // Create a new prof in the db.
     @Override
-    public ProfEntity create(ProfEntity obj) throws SQLException {
+    public ProfEntity create(ProfEntity obj) {
         try {
             PreparedStatement statement;
             statement = this.connect.prepareStatement("INSERT INTO profs(firstname, lastname, username, salt, hashedPassword) VALUES(?, ?, ?, ? , ?);");
             statement.setString(1, obj.getFirstName());
-            System.out.println(obj.getFirstName());
             statement.setString(2, obj.getLastName());
-            System.out.println(obj.getLastName());
             statement.setString(3, obj.getUsername());
-            System.out.println(obj.getUsername());
             statement.setString(4, obj.getSalt());
-            System.out.println(obj.getSalt());
             statement.setString(5, obj.getHashedPassword());
-            System.out.println(obj.getHashedPassword());
             statement.executeUpdate();
 
             return obj;
@@ -64,14 +59,25 @@ public class ProfDAO extends _Generic<ProfEntity> {
         return null;
     }
 
-    // TODO
     @Override
-    public void delete(int id, ArrayList<Integer> gommettes_id) throws SQLException {
+    public void delete(int id, ArrayList<Integer> gommettes_id) {
 
     }
 
+    public boolean deleteProf(int id) {
+        try {
+            PreparedStatement statement;
+            statement = this.connect.prepareStatement("DELETE FROM profs WHERE id=?");
+            statement.setInt(1, id);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public ArrayList<ProfEntity> getUser(String username) {
-        ProfEntity prof = null;
 
         ArrayList<ProfEntity> entities = new ArrayList<>();
         try {
@@ -95,30 +101,6 @@ public class ProfDAO extends _Generic<ProfEntity> {
             e.printStackTrace();
         }
         return entities;
-    }
-
-    public boolean authentificate(String hashedPwd) {
-        try {
-            PreparedStatement statement;
-            statement = this.connect.prepareStatement("SELECT * FROM profs WHERE hashedPassword=?;");
-            statement.setString(1, hashedPwd);
-            ResultSet resultSet = statement.executeQuery();
-            int id_prof = 0;
-            // Even though the SQL request only returns one result, we need the following while loop
-            while (resultSet.next()){
-                try {
-                    id_prof = resultSet.getInt("id");
-                } catch (SQLException e){
-                    e.printStackTrace();
-                    return false;
-                }
-            }
-            return id_prof != 0;
-
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return false;
     }
 
 }
