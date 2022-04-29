@@ -21,7 +21,7 @@ public class StudentCore {
     }
 
     public static boolean create(StudentEntity obj) throws SQLException {
-        boolean check = new StudentDAO().create(obj) != null;
+        boolean check = new StudentDAO().create(obj) == null;
         return check;
     }
 

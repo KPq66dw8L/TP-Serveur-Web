@@ -4,7 +4,6 @@ import com.uca.dao.ProfDAO;
 import com.uca.entity.ProfEntity;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /*
@@ -19,13 +18,17 @@ public class ProfCore {
         return new ProfDAO().getAllUsers();
     }
 
-    public static void create(ProfEntity obj) throws SQLException {
+    public static ProfEntity create(ProfEntity obj) {
         String tmpSalt = BCrypt.gensalt();
         obj.setSalt(tmpSalt);
         String tmpHsPwd = BCrypt.hashpw(obj.getHashedPassword(), tmpSalt); // got to call it hashedPassword in the json, even though it's not hashed at first
 
         obj.setHashedPassword(tmpHsPwd);
-        new ProfDAO().create(obj);
+        ProfEntity tmp = new ProfDAO().create(obj);
+        if (tmp != null) {
+            return ProfCore.getUser(tmp.getUsername(), tmp.getHashedPassword());
+        }
+        return null;
     }
 
     public static ProfEntity getUser(String username, String hashedPwd){
@@ -44,7 +47,7 @@ public class ProfCore {
         return null;
     }
 
-    public static boolean delete(int id, int id_to_del) throws SQLException {
+    public static boolean delete(int id, int id_to_del){
         if (id != id_to_del) {
             return new ProfDAO().deleteProf(id_to_del);
         }

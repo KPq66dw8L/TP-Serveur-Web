@@ -42,9 +42,9 @@ function deleteStudentHandler(e, user, studentsLen, setStudentsLen) {
     .catch(err => console.log(err));
 }
 
-function addGommetteHandler(e, user, gommetteColour, gommetteDescription, studentsLen, setStudentsLen) {
+function addGommetteHandler(e, user, gommetteColour, gommetteDescription, studentsLen, setStudentsLen, auth) {
     e.preventDefault();
-    let prof = JSON.parse(localStorage.getItem('user'));
+    let prof = JSON.parse(auth);
     console.log("Adding une gommette..." + prof.id);
     http.put(`http://localhost:8081/protected/users/${prof.id}`, {
         colour: gommetteColour,
@@ -73,8 +73,8 @@ export default function Students({auth}) {
     const [stuGroup, setStuGroup] = useState("");
 
     let prof = null;
-    if (localStorage.getItem('user') !== null) {
-        prof = JSON.parse(localStorage.getItem('user'));
+    if (auth !== null) {
+        prof = JSON.parse(auth);
     }
 
     // le hook useEffect est appelé à chaque fois que le state du 2eme parametre est modifié, si aucun parametre n'est precisé, 
@@ -99,7 +99,7 @@ export default function Students({auth}) {
 
                         {(prof !== null) && <DeleteStudent user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen}/>}
 
-                        {(prof !== null) && <AddGommetteForm user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen} />}
+                        {(prof !== null) && <AddGommetteForm user={user} studentsLen={studentsLen} setStudentsLen={setStudentsLen} auth={auth} />}
                         
                     </div>
                 ))}
@@ -128,7 +128,7 @@ function DeleteStudent({user, studentsLen, setStudentsLen}){
     return (<a href="#!" id="delete-student" onClick={(e) => deleteStudentHandler(e, user, studentsLen, setStudentsLen)}>Delete student</a>);
 }
 
-function AddGommetteForm({user, studentsLen, setStudentsLen}) {
+function AddGommetteForm({user, studentsLen, setStudentsLen, auth}) {
     const [gommetteColour, setGommetteColour] = useState("white");
     const [gommetteDescription, setGommetteDescription] = useState("");
 
@@ -146,7 +146,7 @@ function AddGommetteForm({user, studentsLen, setStudentsLen}) {
                 <Select options={options} defaultValue={options[0]} onChange={(e) => setGommetteColour(e.value)}/>
 
                 <input required type="text" name="description" placeholder="description" onChange={e => setGommetteDescription(e.target.value)}/>
-                <button onClick={(e) => addGommetteHandler(e, user, gommetteColour, gommetteDescription, studentsLen, setStudentsLen)} type="submit" name="add-gommette">Add gommette</button>
+                <button onClick={(e) => addGommetteHandler(e, user, gommetteColour, gommetteDescription, studentsLen, setStudentsLen, auth)} type="submit" name="add-gommette">Add gommette</button>
             </form>
         </div>
     );

@@ -14,17 +14,22 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import PageNotFound from './pages/PageNotFound';
 
+// custom hook, to synchronize localStorage and state
+const useLocalStorage = (storageKey, fallbackState) => {
+  const [value, setValue] = React.useState(
+    JSON.parse(localStorage.getItem(storageKey)) ?? fallbackState
+  );
+  console.log(value);
+  React.useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(value));
+  }, [value, storageKey]);
+
+  return [value, setValue];
+};
 
 function App() {
 
-  const [auth, setAuth] = useState({});
-
-  useEffect(() => {
-    setAuth(JSON.parse(localStorage.getItem('user')));
-    console.log("AUTH: " + JSON.stringify(auth));
-    
-  }, []);
-
+  const [auth, setAuth] = useLocalStorage('user', null);
 
   return (
     <div className="App">
@@ -38,7 +43,7 @@ function App() {
           <Route path="/students/:id" element={<Student auth={auth}/>}/>
           
           <Route path="/login" element={<Login setAuth={setAuth} auth={auth} />}/>
-          <Route path="/register" element={<Register setAuth={setAuth}/>}/>
+          <Route path="/register" element={<Register setAuth={setAuth} auth={auth}/>}/>
 
           <Route path="*" element={<PageNotFound/>}/>
         </Routes>

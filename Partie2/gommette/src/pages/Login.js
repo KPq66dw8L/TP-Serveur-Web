@@ -4,7 +4,7 @@ import EasyHTTP from './elements/EasyHTTP';
 
 const http = new EasyHTTP();
 
-function loginHandler(e, setAuth, username, password, setMsg, auth) {
+function loginHandler(e, setAuth, username, password, setMsg) {
     e.preventDefault();
     
     if (username !== "" && password !== "" ) {
@@ -15,18 +15,15 @@ function loginHandler(e, setAuth, username, password, setMsg, auth) {
         })
         .then(data => {
             data.text().then(text => {
-                console.log(text);
-                localStorage.setItem('user', text);
-                text = JSON.parse(text);
-                // setAuth(text);
-                setMsg("Bienvenue " + text.firstName + " " + text.lastName);
+                setAuth(text);
+                // text = JSON.parse(text);
+                // setMsg("Bienvenue " + text.firstName + " " + text.lastName);
             });
             document.getElementById('login-form').reset();
         })
         .catch(err => {
             console.log(err);
             setMsg("Erreur d'authentification");
-            localStorage.removeItem('user');
         });
     }
 }
@@ -37,23 +34,12 @@ export default function Login({setAuth, auth}) {
     const [password, setPassword] = useState("");
     const [msg, setMsg] = useState("");
 
-    let tmp = 0;
-
     useEffect(() => {
-        let prof = null;
-        if (localStorage.getItem('user') !== null) {
-            try {
-                prof = JSON.parse(localStorage.getItem('user'));
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        if (prof !== null) {
-            setMsg(`Bienvenue ${prof.lastName}. Vous êtes déjà connecté`);
+        if (auth !== null) {
+            setMsg(`Bienvenue ${JSON.parse(auth).lastName}. Vous êtes déjà connecté`);
             document.getElementById('login-form').innerHTML = ""; // ne sera fait qu'au reload, donc BOF
-            tmp ++;
         }   
-    },[tmp]);
+    },[auth]);
 
     return (
         <div>
@@ -64,7 +50,7 @@ export default function Login({setAuth, auth}) {
                 <input type='text' name='username' placeholder="username" onChange={(e) => setUsername(e.target.value)}/>
                 <input type='text' name='password' placeholder="password" onChange={(e) => setPassword(e.target.value)}/>
 
-                <button onClick={(e) => loginHandler(e, setAuth, username, password, setMsg, auth)}>Login</button>
+                <button onClick={(e) => loginHandler(e, setAuth, username, password, setMsg)}>Login</button>
             </form>
 
             <h1>{msg}</h1>

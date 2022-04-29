@@ -24,11 +24,13 @@ class EasyHTTP {
     // Make an HTTP POST Request
     async post(url, data) {
 
-        // let str = "";
-
         let tmp = "";
         if (localStorage.getItem('user') !== null) {
-            tmp = JSON.parse(localStorage.getItem('user')).token
+            tmp = JSON.parse(JSON.parse(localStorage.getItem('user')))
+            tmp = tmp.token;
+            console.log(tmp);
+        } else {
+            console.log("Problem getting token.")
         }
   
         // Awaiting fetch which contains 
@@ -57,7 +59,11 @@ class EasyHTTP {
         // method, headers and content-type
         let tmp = "";
         if (localStorage.getItem('user') !== null) {
-            tmp = JSON.parse(localStorage.getItem('user')).token
+            tmp = JSON.parse(JSON.parse(localStorage.getItem('user')))
+            tmp = tmp.token;
+            console.log(tmp);
+        } else {
+            console.log("Problem getting token.")
         }
         const response = await fetch(url, {
             method: 'PUT',
@@ -79,6 +85,15 @@ class EasyHTTP {
 
     // Make an HTTP DELETE Request
     async delete(url) {
+
+        let tmp = "";
+        if (localStorage.getItem('user') !== null) {
+            tmp = JSON.parse(JSON.parse(localStorage.getItem('user')))
+            tmp = tmp.token;
+            console.log(tmp);
+        } else {
+            console.log("Problem getting token.")
+        }
   
         // Awaiting fetch which contains 
         // method, headers and content-type
@@ -87,7 +102,7 @@ class EasyHTTP {
             headers: {
                 'Content-type': 'application/json',
                 'Access-Control-Allow-Origin': 'http://localhost:8081',
-                'Authorization': `${JSON.parse(localStorage.getItem('user')).token}`
+                'Authorization': `${tmp}`
             }
         });
   

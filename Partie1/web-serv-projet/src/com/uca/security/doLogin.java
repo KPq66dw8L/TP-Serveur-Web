@@ -3,6 +3,7 @@ package com.uca.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.ExpiredJwtException;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -11,13 +12,15 @@ import java.util.UUID;
 
 public class doLogin {
 
-    // mettre ca dans fichier de configuration a part/ ENV :
+    // devrait etre dans fichier de configuration a part/ ENV em situation réelle:
     private final static String TOKEN = "HIcOONpumSREn9Dn5lzMDICr0xYQIwL6B121ee3pIObGn6bWGjAtvzMXwYFOnkvvA3RRW9jmrH47WCzOUZZhTpP6Zw5Wk06tocTe6OP3zS4NZTUEoEqkDS4YnQ9pSlqP";
 
-    public static Map<String, String> introspec(String token) {
-        Claims claims = null;
+    public static Map<String, String> introspec(String token) throws ExpiredJwtException {
+        Claims claims;
         try {
-            claims = Jwts.parser().setSigningKey(TOKEN).parseClaimsJws(token).getBody(); // on pourrait aussi récupérer le header
+            claims = Jwts.parser().setSigningKey(TOKEN).parseClaimsJws(token).getBody(); // on pourrait aussi récupérer le header, ici seulement le corps
+        } catch (ExpiredJwtException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -38,6 +41,7 @@ public class doLogin {
         content.put("lastName", lastName);
         content.put("username", username);
 
+        // a token last 1 hour
         return Jwts.builder().setClaims(content)
                 .setId(UUID.randomUUID().toString())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))

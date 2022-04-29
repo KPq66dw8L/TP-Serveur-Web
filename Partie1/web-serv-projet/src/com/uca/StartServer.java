@@ -12,7 +12,7 @@ import com.uca.entity.Gommette;
 import com.uca.entity.ProfEntity;
 import com.uca.security.doLogin;
 import com.uca.entity.StudentEntity;
-import org.mindrot.jbcrypt.BCrypt;
+import io.jsonwebtoken.ExpiredJwtException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,22 +52,22 @@ public class StartServer {
                 });
 
         before(
-                (request, response) -> {
-                    response.header("Access-Control-Allow-Origin", "*");
-                });
+                (request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
         before("/protected/*", (request, response) -> {
             //System.out.println(request.headers());
             //System.out.println(request.headers("Authorization"));
             //System.out.println(request.requestMethod());
             if (!request.requestMethod().equals("OPTIONS")) {
-                // TODO: retourner une erreur precise pour TOKEN expiré
                 System.out.println(doLogin.introspec(request.headers("Authorization")));
-
-                if (doLogin.introspec(request.headers("Authorization")) == null) {
-                    halt(401, "You are not welcome here");
-                } else {
-                    System.out.println("Access authorized");
+                try {
+                    if (doLogin.introspec(request.headers("Authorization")) == null) {
+                        halt(401, "You are not welcome here.");
+                    } else {
+                        System.out.println("Access authorized.");
+                    }
+                } catch (ExpiredJwtException e) {
+                    halt(400, "Token expired.");
                 }
             }
         });
@@ -230,8 +230,7 @@ public class StartServer {
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
-
-            if (StudentCore.create(tmpStu)) {
+            if (!StudentCore.create(tmpStu)) {
                 res.status(201);
             } else {
                 res.status(500);
@@ -257,15 +256,36 @@ public class StartServer {
                 e.printStackTrace();
             }
 
-            ProfCore.create(currentProf);
+            ProfEntity prof = ProfCore.create(currentProf);
+            if (prof == null) {
+                halt(400, "Error creating account.");
+            }
+            String token = doLogin.createToken(prof.getId(), prof.getFirstName(), prof.getLastName(), prof.getUsername());
 
-            return res;
+            String json = "";
+            try {
+                // create `ObjectMapper` instance
+                ObjectMapper mapper2 = new ObjectMapper();
+
+                // create a JSON object
+                ObjectNode user = mapper2.createObjectNode();
+                user.put("id", prof.getId());
+                user.put("firstName", prof.getFirstName());
+                user.put("lastName", prof.getLastName());
+                user.put("username", prof.getUsername());
+                user.put("token", token);
+
+                // convert `ObjectNode` to pretty-print JSON
+                json = mapper2.writerWithDefaultPrettyPrinter().writeValueAsString(user);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return json;
         });
 
         // login a prof
         post("/login", (req, res) -> {
             System.out.println("login started");
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
 
             ProfEntity currentProf  = new ProfEntity();
 
@@ -415,7 +435,10 @@ public class StartServer {
             int id_prof = Integer.parseInt(req.params(":id"));
             int id_to_del = Integer.parseInt(req.params(":idToDel"));
 
-            ProfCore.delete(id_prof, id_to_del);
+            boolean status = ProfCore.delete(id_prof, id_to_del);
+            if (!status) {
+                res.status(404);
+            }
             return res;
         });
     }
