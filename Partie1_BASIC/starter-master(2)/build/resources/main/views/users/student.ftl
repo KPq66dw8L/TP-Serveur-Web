@@ -2,6 +2,12 @@
 
 <body xmlns="http://www.w3.org/1999/html">
 
+    <ul>
+        <li><a href="http://localhost:8081/login">login</a></li>
+        <li><a href="http://localhost:8081/register">register</a></li>
+        <li><a href="http://localhost:8081/users">students</a></li>
+    </ul>
+
     <h1>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}</h1>
 
 
@@ -11,7 +17,8 @@
 
             <div>
                 <#items as gommete1>
-                    <li>White. Description: ${gommete1.getGommette().getDescription()} Date: ${gommete1.getDate()}. Prof id: ${gommete1.getId_prof()} <a data-gommette-id="http://localhost:8081/gommette/${gommete1.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></li>
+                    <li>White. Description: ${gommete1.getGommette().getDescription()} Date: ${gommete1.getDate()}. Prof id: ${gommete1.getId_prof()} <#if logged == true><a data-gommette-id="http://localhost:8081/gommette/${gommete1.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></#if></li>
+
 
                     <form style="display: none;" id="modify-form">
                         <select name="gommette" id="gommette">
@@ -34,7 +41,8 @@
                         <button type="submit" name="send-modify">Modify gommette</button>
                     </form>
 
-                </#items>
+
+                        </#items>
             </div>
 
         </#list></ul>
@@ -44,7 +52,7 @@
 
             <div>
                 <#items as gommete2>
-                    <li>Green. Description: ${gommete2.getGommette().getDescription()} Date: ${gommete2.getDate()}. Prof id: ${gommete2.getId_prof()} <a data-gommette-id="http://localhost:8081/gommette/${gommete2.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></li>
+                    <li>Green. Description: ${gommete2.getGommette().getDescription()} Date: ${gommete2.getDate()}. Prof id: ${gommete2.getId_prof()} <#if logged == true><a data-gommette-id="http://localhost:8081/gommette/${gommete2.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></#if></li>
 
                         <form style="display: none;" id="modify-form">
                             <select name="gommette" >
@@ -77,7 +85,7 @@
 
             <div>
                 <#items as gommete3>
-                    <li>Red. Description: ${gommete3.getGommette().getDescription()}. Date: ${gommete3.getDate()}. Prof id: ${gommete3.getId_prof()} <a data-gommette-id="http://localhost:8081/gommette/${gommete3.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></li>
+                    <li>Red. Description: ${gommete3.getGommette().getDescription()}. Date: ${gommete3.getDate()}. Prof id: ${gommete3.getId_prof()} <#if logged == true><a data-gommette-id="http://localhost:8081/gommette/${gommete3.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></#if></li>
                     <form style="display: none;" id="modify-form">
                             <select name="gommette" >
                                 <option value="white">White</option>

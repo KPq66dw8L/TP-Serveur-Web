@@ -84,6 +84,7 @@ document.body.onload = async () => {
 
     // for each to handle the click on every buttons generated on the page
     buttons.forEach(button => { 
+        
         button.addEventListener('click', function handleClick(e) {
             e.preventDefault(); // to avoid problems related to Cross-Origin Resource Sharing (CORS)
     
@@ -120,7 +121,7 @@ document.body.onload = async () => {
                 let data = {
                     colour: e.target.elements.gommette.value,
                     description: e.target.elements.description.value,
-                    id: e.target.elements.studentId.value, //we send the student value to the server
+                    id: e.target.elements.studentId.value,
                 };
     
                 // let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;

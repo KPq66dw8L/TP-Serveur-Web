@@ -1,7 +1,5 @@
 package com.uca.entity;
 
-import java.util.ArrayList;
-
 public class Gommette {
     private int id;
     private String colour;

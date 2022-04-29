@@ -1,12 +1,11 @@
 package com.uca;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uca.core.ProfCore;
 import com.uca.dao._Initializer;
 import com.uca.entity.Gommette;
-import com.uca.entity.ProfEntity;
 import com.uca.gui.ProfGUI;
 import com.uca.gui.StudentGUI;
+import com.uca.security.doLogin;
 
 import javax.servlet.MultipartConfigElement;
 import java.util.ArrayList;
@@ -24,79 +23,83 @@ public class StartServer {
         _Initializer.Init();
         /*
         * ***
-        * Router
+        * Router, defining our routes
         * ***
         **/
-        //Defining our routes
 
-        /*
-         * Print all students, and more features to logged in profs
-         **/
-        get("/users", (req, res) -> {
-
-            /*
-             * From the infos in the cookie, we check if the user exists in our db
-             **/
-            //need authentificate()
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-            ProfEntity currentProf = null;
-            String tmpUsername = new String();
-            String tmpPassword = new String();
-            String[] parts;
-            try {
-                parts = req.cookie("user").split("----");
-                tmpUsername = parts[0];
-                tmpPassword = parts[1];
-            } catch (Exception e){
-            }
-            for (ProfEntity prof : profs){
-                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
-                    currentProf = prof;
-                    break;
-                }
-            }
-            /*
-             * If the user exists in our db and the cookie is written, then he is logged-in and he can see the students(everyone can) + add gommettes etc
-             * Else he can only see the list of students
-             **/
-            if (currentProf != null){
-                return StudentGUI.getAllUsers(true);
-            } else {
-                return StudentGUI.getAllUsers(false);
-            }
+        //Print all students, and more features to logged in profs
+        get("/", (req, res) -> {
+            res.redirect("/users");
+            return null;
         });
 
-        /*
-         * Get a precise student page, listing its gommettes with their description
-         **/
+        get("/users", (req, res) -> {
+            String token = req.cookie("user");
+            if (token == null) {
+                return StudentGUI.getAllUsers(false);
+            }
+            try {
+                doLogin.introspec(token);
+            } catch (Exception e) {
+                return StudentGUI.getAllUsers(false);
+            }
+            /*
+             * If the user exists in our db and the cookie is written, then he is logged-in and he can see the students + add gommettes etc
+             * Else he can only see the list of students
+             **/
+            return StudentGUI.getAllUsers(true);
+        });
+
+        //Get a precise student page, listing its gommettes with their description
         get("/users/:id", (req, res) -> {
             String id = req.params(":id");
 
-            return StudentGUI.getUser(id);
+            String token = req.cookie("user");
+            if (token == null) {
+                return StudentGUI.getUser(id, false);
+            }
+            try {
+                doLogin.introspec(token);
+            } catch (Exception e) {
+                return StudentGUI.getUser(id, false);
+            }
+
+            return StudentGUI.getUser(id, true);
         });
 
-        /*
-         * List all profs
-         **/
+        //List all profs
         get("/register", (req, res) -> {
-            return ProfGUI.getAllUsers();
+            String token = req.cookie("user");
+            if (token == null) {
+                return ProfGUI.registerPage(false);
+            }
+            try {
+                doLogin.introspec(token);
+            } catch (Exception e) {
+                return ProfGUI.registerPage(false);
+            }
+            return ProfGUI.registerPage(true);
         });
 
-        /*
-         * Print the login page
-         **/
+        //Print the login page
         get("/login", (req, res) -> {
-            return ProfGUI.loginPage();
+            String token = req.cookie("user");
+            if (token == null) {
+                return ProfGUI.loginPage(false);
+            }
+            try {
+                doLogin.introspec(token);
+            } catch (Exception e) {
+                return ProfGUI.loginPage(false);
+            }
+            return ProfGUI.loginPage(true);
         });
 
-        /*
-         * Handle post request from 1st form to add a student & 2nd form to add a gommette
-         **/
+        //Handle post request from 1st form to add a student & 2nd form to add a gommette
         post("/users", (req, res) -> {
-//            System.out.println("CHECK");
 
-            String firstname, lastname, group, gommette, description, studentID, tmpUsername = null, tmpPassword = null;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+            String firstname, lastname, group, gommette, description, studentID;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
 
             // on recup les infos du 1er formulaire
@@ -108,23 +111,16 @@ public class StartServer {
             gommette = req.queryParams("gommette");
             description = req.queryParams("description");
             studentID = req.queryParams("studentName");
-//            System.out.println(gommette + " " + description + " " + studentID);
 
-            //need authentificate()
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-            ProfEntity currentProf = null;
-            String[] parts;
-            try {
-                parts = req.cookie("user").split("----");
-                tmpUsername = parts[0];
-                tmpPassword = parts[1];
-            } catch (Exception e){
+            String token = req.cookie("user");
+            int id_prof = -1;
+            if (token == null) {
+                halt(401);
             }
-            for (ProfEntity prof : profs){
-                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
-                    currentProf = prof;
-                    break;
-                }
+            try {
+                id_prof = Integer.parseInt(doLogin.introspec(token).get("uuid"));
+            } catch (Exception e) {
+                halt(401);
             }
 
             res.redirect("/users");
@@ -133,19 +129,17 @@ public class StartServer {
             if (firstname != null && lastname != null && group != null){
                 return StudentGUI.create(firstname, lastname, group);
             } else if (gommette != null && description != null && studentID != null){
-                return StudentGUI.addGommette(gommette, description, studentID, currentProf.getId());
+                return StudentGUI.addGommette(gommette, description, studentID, id_prof);
             } else {
                 return null;
             }
         });
 
-        /*
-         * Call create() to handle registration from form
-         **/
+        //Call create() to handle registration from form
         post("/register", (req, res) -> {
 
             String firstname, lastname, username, newPassword;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
             // try?
             firstname = req.queryParams("firstname");
@@ -156,88 +150,29 @@ public class StartServer {
             return ProfGUI.create(firstname, lastname, username, newPassword);
         });
 
-        /*
-         * Call login(), also passes 'response' to be able to write a cookie
-         **/
+        //Call login(), also passes 'response' to be able to write a cookie
         post("/login", (req, res) -> {
 
-            String firstname, lastname, username, newPassword;
-            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp")); // ne sait pas ce que ce truc fait yet, mais fonctionne pas sans
+            String username, newPassword;
+            req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
             username = req.queryParams("username");
             newPassword = req.queryParams("password");
 
-            return ProfGUI.login(username, newPassword, res);
-        });
-
-        /*
-         * Add a gommette to a user
-         **/
-        put("/users", (req, res) -> {
-            //if you want to check the JSON.stringify in the PUT's payload
-//            System.out.println(req.body());
-
-            Gommette gomTmp = null;
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                /*
-                 * JSON from String to Object.
-                 * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
-                 * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
-                 **/
-                gomTmp = mapper.readValue(req.body(), Gommette.class);
-            } catch ( Exception e ) {
-                System.out.println(e);
+            ArrayList<String> tokenAndPage = ProfGUI.login(username, newPassword);
+            if (tokenAndPage == null) {
+                return "User does not exists.";
             }
-
-
-
-
-//            String tmp = req.body().replaceAll("\"", "");
-//            // a l'ancienne
-//            String[] formParts = null;
-//            try {
-//                formParts = tmp.split("----");
-//            } catch (Exception e){
-//                System.out.println(e);
-//            }
-
-            String gommette, description, studentID, tmpUsername = null, tmpPassword = null;
-
-            //need authentificate()
-            ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-            ProfEntity currentProf = null;
-            String[] parts;
             try {
-                parts = req.cookie("user").split("----");
-                tmpUsername = parts[0];
-                tmpPassword = parts[1];
+                res.cookie("user", tokenAndPage.get(0));
             } catch (Exception e){
+                e.printStackTrace();
             }
-            for (ProfEntity prof : profs){
-                if (tmpUsername.equals(prof.getUsername()) && tmpPassword.equals(prof.getHashedPassword())){
-                    currentProf = prof;
-                    break;
-                }
-            }
-
-
-//            return StudentGUI.addGommette(formParts[0], formParts[1], formParts[2], currentProf.getId());
-            return StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), currentProf.getId());
+            return tokenAndPage.get(1);
         });
 
-        /*
-         * Modify a specific gommette
-         **/
-        put("/users/:id", (req, res) -> {
-//            String tmp = req.body().replaceAll("\"", "");
-//
-//            String[] formParts = null;
-//            try {
-//                formParts = tmp.split("----");
-//            } catch (Exception e){
-//                System.out.println(e);
-//            }
+        //Add a gommette to a user
+        put("/users", (req, res) -> {
 
             Gommette gomTmp = null;
             ObjectMapper mapper = new ObjectMapper();
@@ -249,27 +184,65 @@ public class StartServer {
                  **/
                 gomTmp = mapper.readValue(req.body(), Gommette.class);
             } catch ( Exception e ) {
-                System.out.println(e);
+                e.printStackTrace();
+            }
+            int id_prof = -1;
+            String token = req.cookie("user");
+            if (token == null) {
+                halt(401);
+            }
+            try {
+                id_prof = Integer.parseInt(doLogin.introspec(token).get("uuid"));
+            } catch (Exception e) {
+                halt(401);
             }
 
-            //return StudentGUI.modifyGommette(formParts[0], formParts[1], formParts[2], req.params(":id"));
-            return StudentGUI.modifyGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), req.params(":id"));
+            return StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), id_prof);
         });
 
-        /*
-         * .queryParam -> localhost:8081/users/delete?firstname=julien&lastname=herbaux
-         * .params -> /users/:id/delete
-         **/
+        //Modify a specific gommette
+        put("/users/:id", (req, res) -> {
+
+            Gommette gomTmp = null;
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                /*
+                 * JSON from String to Object.
+                 * the following automatically map the values in the JSON.stringify to the variable with the same name in the class instance (gomTmp).
+                 * BTW: we put an id in the Gommette instance, the id is the one of the student, we juste store it there for now
+                 **/
+                gomTmp = mapper.readValue(req.body(), Gommette.class);
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
+
+            return StudentGUI.modifyGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()));
+        });
+
         delete("/users/:id/delete", (req, res) -> {
             String id = req.params(":id");
-
             return StudentGUI.delete(id);
         });
 
         delete("/gommette/:id/delete", (req, res) -> {
             String id = req.params(":id");
-
             return StudentGUI.deleteGommette(id);
+        });
+
+        delete("/prof/:id/delete", (req, res) -> {
+            String id_to_del = req.params(":id");
+
+            String id_prof = "";
+            String token = req.cookie("user");
+            if (token == null) {
+                halt(401);
+            }
+            try {
+                id_prof = doLogin.introspec(token).get("uuid");
+            } catch (Exception e) {
+                halt(401);
+            }
+            return ProfGUI.delete(id_prof, id_to_del);
         });
     }
 }

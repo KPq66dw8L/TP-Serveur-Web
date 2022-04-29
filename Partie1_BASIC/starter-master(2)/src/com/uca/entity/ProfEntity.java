@@ -1,9 +1,6 @@
 package com.uca.entity;
 
 public class ProfEntity extends UserEntity{
-//    private int id;
-//    private String firstname;
-//    private String lastname;
     private String username;
     private String salt;
     private String hashedPassword;

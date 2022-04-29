@@ -2,9 +2,7 @@ package com.uca.core;
 
 import com.uca.dao.StudentDAO;
 import com.uca.entity.GivenGommettes;
-import com.uca.entity.Gommette;
 import com.uca.entity.StudentEntity;
-import com.uca.entity.UserEntity;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,7 +27,6 @@ public class StudentCore {
     }
 
     public static void addGommette(GivenGommettes donneLeGommette){
-//        System.out.println("addGommette dans StudentCore Action");
         new StudentDAO().addGommette(donneLeGommette);
     }
 

@@ -55,9 +55,6 @@ public class StartServer {
                 (request, response) -> response.header("Access-Control-Allow-Origin", "*"));
 
         before("/protected/*", (request, response) -> {
-            //System.out.println(request.headers());
-            //System.out.println(request.headers("Authorization"));
-            //System.out.println(request.requestMethod());
             if (!request.requestMethod().equals("OPTIONS")) {
                 System.out.println(doLogin.introspec(request.headers("Authorization")));
                 try {

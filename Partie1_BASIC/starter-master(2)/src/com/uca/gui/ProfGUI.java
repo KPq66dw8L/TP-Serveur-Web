@@ -1,8 +1,8 @@
 package com.uca.gui;
 
 import com.uca.core.ProfCore;
-import com.uca.core.StudentCore;
 import com.uca.entity.ProfEntity;
+import com.uca.security.doLogin;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -24,18 +24,14 @@ import java.util.Map;
  **/
 public class ProfGUI {
 
-    /*
-     * Return all profs. Send infos to FreeMarker that parses and use HashMap, and return the page as a string
-     **/
-    public static String getAllUsers() throws IOException, TemplateException {
+    //Return all profs. Send infos to FreeMarker that parses and use HashMap, and return the page as a string
+    public static String registerPage(boolean loggedIn) throws IOException, TemplateException {
         Configuration configuration = _FreeMarkerInitializer.getContext();
 
-        /*
-         * 1 call in .ftl = 1 obj in Java, with the HashMap
-         **/
         Map<String, Object> input = new HashMap<>();
 
         input.put("users", ProfCore.getAllUsers());
+        input.put("logged", loggedIn);
 
         Writer output = new StringWriter();
         Template template = configuration.getTemplate("users/register.ftl");
@@ -44,9 +40,7 @@ public class ProfGUI {
         return output.toString();
     }
 
-    /*
-     * Handle part of the registration of a prof = create a new prof entity, and return the list of profs afterwards
-     **/
+    //Handle part of the registration of a prof = create a new prof entity, and return the list of profs afterwards
     public static String create(String firstname, String lastname, String username, String newPassword) throws SQLException, IOException, TemplateException {
 
         ProfEntity newUser = new ProfEntity();
@@ -54,93 +48,75 @@ public class ProfGUI {
         newUser.setFirstName(firstname);
         newUser.setLastName(lastname);
         newUser.setUsername(username);
-        String tmpSalt = BCrypt.gensalt();
+        newUser.setHashedPassword(newPassword);
+        ProfCore.create(newUser);
 
-
-        newUser.setSalt(tmpSalt);
-        String tmpHsPwd = BCrypt.hashpw(newPassword, tmpSalt);
-
-
-        newUser.setHashedPassword(tmpHsPwd);
-
-        newUser = ProfCore.create(newUser);
-
-        return ProfGUI.getAllUsers();
-    }
-
-    /*
-     * Content of the login page, to print a custom validation msg when successfully logged in
-     **/
-    public static String loginPage() throws IOException, TemplateException {
         Configuration configuration = _FreeMarkerInitializer.getContext();
-
         Map<String, Object> input = new HashMap<>();
-
-        input.put("msg", "");
+        input.put("logged", true);
 
         Writer output = new StringWriter();
-        Template template = configuration.getTemplate("users/login.ftl");
+        Template template = configuration.getTemplate("users/register.ftl");
         template.setOutputEncoding("UTF-8");
         template.process(input, output);
 
         return output.toString();
     }
 
-    /*
-     * Handle login = check if user exists in db and if so, write it in cookie "user"
-     **/
-    public static String login(String username, String password, spark.Response res) throws TemplateException, IOException {
-
-        ArrayList<ProfEntity> profs = ProfCore.getAllUsers();
-        ProfEntity currentProf  = new ProfEntity();
-
-        int tmp = 0;
-
-        for (ProfEntity prof : profs){
-            if (BCrypt.hashpw(password, prof.getSalt()).equals(prof.getHashedPassword())){
-                currentProf = prof;
-                tmp = 1;
-                break;
-            }
-        }
-
-        if (currentProf == null || tmp == 0){
-            return "Non.";
-        }
-
+    //Content of the login page, to print a custom validation msg when successfully logged in
+    public static String loginPage(boolean loggedIn) throws IOException, TemplateException {
         try {
-            String tmpCookie = currentProf.getUsername() + "----" + currentProf.getHashedPassword();
-            res.cookie("user", tmpCookie); //la valeur du cookie doit etre passée par une variable..
+            Configuration configuration = _FreeMarkerInitializer.getContext();
 
-        } catch (Exception e){
-            System.out.println(e);
+            Map<String, Object> input = new HashMap<>();
+
+            input.put("msg", "");
+            input.put("logged", loggedIn);
+
+            Writer output = new StringWriter();
+            Template template = configuration.getTemplate("users/login.ftl");
+            template.setOutputEncoding("UTF-8");
+            template.process(input, output);
+
+            return output.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return "Erreur";
+    }
+
+    //Handle login = check if user exists in db and if so, write it in cookie "user"
+    public static ArrayList<String> login(String username, String password) throws TemplateException, IOException {
+        ProfEntity prof = ProfCore.getUser(username, password); // login du prof
+        if (prof == null) {
+            return null;
+        }
+        String token = doLogin.createToken(prof.getId(), prof.getFirstName(), prof.getLastName(), prof.getUsername()); //creation du token pour la session
 
         Configuration configuration = _FreeMarkerInitializer.getContext();
-
-        /*
-         * 1 call in .ftl = 1 obj in Java, with the HashMap
-         **/
         Map<String, Object> input = new HashMap<>();
 
-        input.put("msg", "Bienvenue " + currentProf.getUsername());
+        input.put("msg", "Bienvenue " + prof.getUsername());
+        input.put("logged", true);
 
         Writer output = new StringWriter();
         Template template = configuration.getTemplate("users/login.ftl");
         template.setOutputEncoding("UTF-8");
         template.process(input, output);
 
-        return output.toString();
+        //mise en form du return
+        ArrayList<String> ret = new ArrayList<>();
+        ret.add(token);
+        ret.add(output.toString());
+        return ret;
     }
 
-    /*
-     * OUTDATED
-     **/
-    public static String delete(String firstname, String lastname) throws SQLException, TemplateException, IOException {
+    public static String delete(String strId, String strId_to_del) throws SQLException, TemplateException, IOException {
 
-        ProfEntity obj = new ProfEntity();
+        int id = Integer.parseInt(strId);
+        int id_to_del = Integer.parseInt(strId_to_del);
 
-        ProfCore.delete(obj);
-        return ProfGUI.getAllUsers();
+        ProfCore.delete(id, id_to_del);
+        return null;
     }
 }
