@@ -1,0 +1,17 @@
+.navBar {
+    display: flex;
+    gap: 2rem;
+    margin: 5vh 0;
+    
+}
+
+.navBar li {
+    list-style: none;
+    display: inline-block;
+}
+
+.navBar li a {
+    text-decoration: none;
+    color: inherit;
+    text-transform: uppercase;
+}
