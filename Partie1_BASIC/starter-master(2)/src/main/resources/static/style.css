@@ -1,8 +1,16 @@
+
+body {
+    padding: 5rem;
+    background: #fafafa;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+}
+
 .navBar {
     display: flex;
     gap: 2rem;
-    margin: 5vh 0;
-    
+    margin-bottom: 5vh;
+    justify-content: center;
 }
 
 .navBar li {
@@ -14,4 +22,9 @@
     text-decoration: none;
     color: inherit;
     text-transform: uppercase;
+}
+
+.navBar li a:hover {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #000;
 }

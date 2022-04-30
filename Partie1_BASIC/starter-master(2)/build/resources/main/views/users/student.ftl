@@ -1,5 +1,5 @@
 <#ftl encoding="utf-8">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../style.css">
 
 <body xmlns="http://www.w3.org/1999/html">
 
@@ -11,7 +11,7 @@
 
 
 
-    <h1>${user.id} - ${user.firstName} ${user.lastName} in ${user.group}</h1>
+    <h1>ID:${user.id} - ${user.firstName} ${user.lastName} in ${user.group}</h1>
 
 
 
