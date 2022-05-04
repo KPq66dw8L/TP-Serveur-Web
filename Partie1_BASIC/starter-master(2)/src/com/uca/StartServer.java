@@ -12,6 +12,8 @@ import java.util.ArrayList;
 
 import static spark.Spark.*;
 
+// La réponse est B Jean-Pierre, et c'est mon ultime bafouille !
+
 public class StartServer {
 
     public static void main(String[] args) {
