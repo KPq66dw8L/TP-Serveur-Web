@@ -100,15 +100,15 @@ public class _Initializer {
             statement.executeUpdate();
 
             // Reset the ids starting number, as they always auto-increment
-            statement = connection.prepareStatement("ALTER TABLE students AUTO_INCREMENT = 1;");
-            statement.executeUpdate();
-            statement = connection.prepareStatement("ALTER TABLE gommettes AUTO_INCREMENT = 1;");
-            statement.executeUpdate();
-            statement = connection.prepareStatement("ALTER TABLE givenGommettes AUTO_INCREMENT = 1;");
-            statement.executeUpdate();
-
-            statement = connection.prepareStatement("ALTER TABLE profs AUTO_INCREMENT = 1;");
-            statement.executeUpdate();
+//            statement = connection.prepareStatement("ALTER TABLE students AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
+//            statement = connection.prepareStatement("ALTER TABLE gommettes AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
+//            statement = connection.prepareStatement("ALTER TABLE givenGommettes AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
+//
+//            statement = connection.prepareStatement("ALTER TABLE profs AUTO_INCREMENT = 1;");
+//            statement.executeUpdate();
 
 
         } catch (Exception e){

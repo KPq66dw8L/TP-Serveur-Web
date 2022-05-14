@@ -41,7 +41,7 @@ public class StudentGUI {
         Writer output = new StringWriter();
         //try-catch, otherwise an error in template gives a 505 error and no traceback
         try {
-            Template template = configuration.getTemplate("users/users.ftl");
+            Template template = configuration.getTemplate("content/list.ftl");
             template.setOutputEncoding("UTF-8");
             template.process(input, output);
         } catch (Exception e){
@@ -85,7 +85,7 @@ public class StudentGUI {
         Writer output = new StringWriter();
 
         try {
-            Template template = configuration.getTemplate("users/student.ftl");
+            Template template = configuration.getTemplate("content/single.ftl");
             template.setOutputEncoding("UTF-8");
             template.process(input, output);
         } catch (Exception e){

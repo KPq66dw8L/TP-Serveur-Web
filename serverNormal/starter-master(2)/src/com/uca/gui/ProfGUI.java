@@ -34,7 +34,7 @@ public class ProfGUI {
         input.put("logged", loggedIn);
 
         Writer output = new StringWriter();
-        Template template = configuration.getTemplate("users/register.ftl");
+        Template template = configuration.getTemplate("content/register.ftl");
         template.setOutputEncoding("UTF-8");
         template.process(input, output);
         return output.toString();
@@ -71,7 +71,7 @@ public class ProfGUI {
             input.put("logged", loggedIn);
 
             Writer output = new StringWriter();
-            Template template = configuration.getTemplate("users/login.ftl");
+            Template template = configuration.getTemplate("content/login.ftl");
             template.setOutputEncoding("UTF-8");
             template.process(input, output);
 
@@ -97,7 +97,7 @@ public class ProfGUI {
         input.put("logged", true);
 
         Writer output = new StringWriter();
-        Template template = configuration.getTemplate("users/login.ftl");
+        Template template = configuration.getTemplate("content/login.ftl");
         template.setOutputEncoding("UTF-8");
         template.process(input, output);
 
