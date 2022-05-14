@@ -9,6 +9,7 @@ import com.uca.security.doLogin;
 
 import javax.servlet.MultipartConfigElement;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static spark.Spark.*;
 
@@ -120,7 +121,7 @@ public class StartServer {
                 halt(401);
             }
             try {
-                id_prof = Integer.parseInt(doLogin.introspec(token).get("uuid"));
+                id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
             } catch (Exception e) {
                 halt(401);
             }
@@ -194,7 +195,7 @@ public class StartServer {
                 halt(401);
             }
             try {
-                id_prof = Integer.parseInt(doLogin.introspec(token).get("uuid"));
+                id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
             } catch (Exception e) {
                 halt(401);
             }
@@ -240,7 +241,7 @@ public class StartServer {
                 halt(401);
             }
             try {
-                id_prof = doLogin.introspec(token).get("uuid");
+                id_prof = Objects.requireNonNull(doLogin.introspec(token)).get("uuid");
             } catch (Exception e) {
                 halt(401);
             }

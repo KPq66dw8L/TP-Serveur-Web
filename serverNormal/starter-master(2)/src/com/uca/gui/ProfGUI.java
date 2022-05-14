@@ -40,10 +40,16 @@ public class ProfGUI {
         return output.toString();
     }
 
-    //Handle part of the registration of a prof = create a new prof entity, and return the list of profs afterwards
+    //Handle part of the registration of a prof => create a new prof entity, and return the list of profs afterwards
     public static String create(String firstname, String lastname, String username, String newPassword) throws SQLException, IOException, TemplateException {
 
         ProfEntity newUser = new ProfEntity();
+
+        if (username != null) {
+            if (ProfCore.isUsernameTaken(username)) {
+                return "Username already taken.";
+            }
+        }
 
         newUser.setFirstName(firstname);
         newUser.setLastName(lastname);
@@ -51,16 +57,7 @@ public class ProfGUI {
         newUser.setHashedPassword(newPassword);
         ProfCore.create(newUser);
 
-        Configuration configuration = _FreeMarkerInitializer.getContext();
-        Map<String, Object> input = new HashMap<>();
-        input.put("logged", true);
-
-        Writer output = new StringWriter();
-        Template template = configuration.getTemplate("users/register.ftl");
-        template.setOutputEncoding("UTF-8");
-        template.process(input, output);
-
-        return output.toString();
+        return registerPage(true);
     }
 
     //Content of the login page, to print a custom validation msg when successfully logged in
@@ -85,7 +82,7 @@ public class ProfGUI {
         return "Erreur";
     }
 
-    //Handle login = check if user exists in db and if so, write it in cookie "user"
+    //Handle login = check if user exists in db and if so, write it in cookie with key: "user"
     public static ArrayList<String> login(String username, String password) throws TemplateException, IOException {
         ProfEntity prof = ProfCore.getUser(username, password); // login du prof
         if (prof == null) {

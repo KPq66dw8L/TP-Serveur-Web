@@ -6,6 +6,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.prefs.PreferencesFactory;
 
 /*
  * ***
@@ -49,4 +50,9 @@ public class ProfCore {
         }
         return false;
     }
+
+    public static boolean isUsernameTaken(String username) {
+        return new ProfDAO().isUsernameTaken(username);
+    }
+
 }

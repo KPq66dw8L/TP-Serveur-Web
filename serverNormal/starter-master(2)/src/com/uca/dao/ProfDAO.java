@@ -104,4 +104,26 @@ public class ProfDAO extends _Generic<ProfEntity> {
         return entities;
     }
 
+    public boolean isUsernameTaken(String username) {
+        try {
+            PreparedStatement preparedStatement = this.connect.prepareStatement("SELECT id FROM profs WHERE username=?;");
+            preparedStatement.setString(1, username);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                return false;
+            }
+//            while (resultSet.next()) {
+//
+//                if (resultSet.getInt("id") != null) {
+//                    return false;
+//                }
+//
+//            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
 }
