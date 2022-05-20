@@ -389,11 +389,6 @@ public class StartServer {
             return res;
         });
 
-        /*
-         * Notes:
-         * .queryParam -> localhost:8081/users/delete?firstname=julien&lastname=Airbot
-         * .params -> /users/:id/delete
-         **/
         // delete a student
         delete("/protected/users/:id/delete", (req, res) -> {
             int id = Integer.parseInt(req.params(":id"));

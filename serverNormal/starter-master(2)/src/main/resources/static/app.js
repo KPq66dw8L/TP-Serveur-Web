@@ -1,45 +1,4 @@
-class EasyHTTP {
-  
-    // Make an HTTP DELETE Request
-    async delete(url) {
-  
-        // Awaiting fetch which contains 
-        // method, headers and content-type
-        const response = await fetch(url, {
-            method: 'DELETE',
-            headers: {
-                'Content-type': 'application/json'
-            }
-        });
-  
-        // Awaiting for the resource to be deleted
-        const resData = 'resource deleted...';
-  
-        // Return response data 
-        return resData;
-    }
-
-    // Make an HTTP PUT Request
-    async put(url, data) {
-  
-        // Awaiting fetch which contains 
-        // method, headers and content-type
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-  
-        // Awaiting for the resource to be deleted
-        // const resData = await response.json();
-        const resData = 'resource updated...';
-  
-        // Return response data 
-        return resData;
-    }
-}
+import EasyHTTP from "./EasyHTTP.js";
 
 // Instantiating new EasyHTTP class
 const http = new EasyHTTP;
@@ -86,7 +45,7 @@ document.body.onload = async () => {
     buttons.forEach(button => { 
         
         button.addEventListener('click', function handleClick(e) {
-            e.preventDefault(); // to avoid problems related to Cross-Origin Resource Sharing (CORS)
+            e.preventDefault(); // to avoid problems related to CORS
     
             let link;
             // get the link to make a DELETE request to, depending on the specific gommette or student 
@@ -126,7 +85,7 @@ document.body.onload = async () => {
     
                 // let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.studentId.value}`;
     
-                http.put("http://localhost:8081/users", data)
+                http.put("http://localhost:8081/protected/users", data)
           
                 // Resolving promise for response data
                 .then(data => console.log(data))
@@ -155,7 +114,7 @@ document.body.onload = async () => {
 
             //let data = `${e.target.elements.gommette.value}----${e.target.elements.description.value}----${e.target.elements.gommetteId.value}`;
 
-            http.put(`http://localhost:8081/users/${e.target.elements.studentId.value}`, data)
+            http.put(`http://localhost:8081/protected/users/${e.target.elements.studentId.value}`, data)
       
             // Resolving promise for response data
             .then(data => console.log(data))

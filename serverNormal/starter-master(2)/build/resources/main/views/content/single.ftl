@@ -20,7 +20,7 @@
 
             <div>
                 <#items as gommete1>
-                    <li>White. Description: ${gommete1.getGommette().getDescription()} Date: ${gommete1.getDate()}. Prof id: ${gommete1.getId_prof()} <#if logged == true><a data-gommette-id="http://localhost:8081/gommette/${gommete1.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></#if></li>
+                    <li>White. Description: ${gommete1.getGommette().getDescription()} Date: ${gommete1.getDate()}. Prof id: ${gommete1.getId_prof()} <#if logged == true><a data-gommette-id="http://localhost:8081/protected/gommette/${gommete1.getId()}/delete" href="#" id="delete-gommette">Delete gommette</a><button id="modify-gommette">Modify gommette</button></#if></li>
 
 
                     <form style="display: none;" id="modify-form">
@@ -114,7 +114,9 @@
 
         </#list></ul>
 
-    <script src="../app.js"></script>
+
 </body>
+
+<script src="../app.js" type="module"></script>
 
 </html>

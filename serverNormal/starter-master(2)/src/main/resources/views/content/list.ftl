@@ -16,7 +16,7 @@
 
         <#if logged == true>
 
-            <a data-student-id="http://localhost:8081/users/${user.id}/delete" href="#" id="delete-student">Delete student</a>
+            <a data-student-id="http://localhost:8081/protected/users/${user.id}/delete" href="#" id="delete-student">Delete student</a>
 
             <form method='post' enctype='multipart/form-data' id="add-gommette">
 
@@ -35,7 +35,7 @@
 </ul>
 
         <#if logged == true>
-            <form method='post' enctype='multipart/form-data'>
+            <form method='post' enctype='multipart/form-data' action="http://localhost:8081/protected/users">
               <input type='text' name='firstname' placeholder="firstname">
               <input type='text' name='lastname' placeholder="lastname">
               <input type='text' name='group' placeholder="group/class">
@@ -44,8 +44,10 @@
             </form>
         </#if>
 
-<script src="./app.js"></script>
+
 
 </body>
+
+<script src="./app.js" type="module"></script>
 
 </html>

@@ -22,7 +22,6 @@ public class StartServer {
         staticFiles.location("/static/");
         port(8081);
 
-
         _Initializer.Init();
         /*
         * ***
@@ -30,12 +29,13 @@ public class StartServer {
         * ***
         **/
 
-        //Print all students, and more features to logged in profs
+        //Redirect to "/users"
         get("/", (req, res) -> {
             res.redirect("/users");
             return null;
         });
 
+        //Print all students, and more features to logged in profs
         get("/users", (req, res) -> {
             String token = req.cookie("user");
             if (token == null) {
@@ -53,7 +53,7 @@ public class StartServer {
             return StudentGUI.getAllUsers(true);
         });
 
-        //Get a precise student page, listing its gommettes with their description
+        //Get a precise student page, listing its gommettes and associated descriptions
         get("/users/:id", (req, res) -> {
             String id = req.params(":id");
 
@@ -84,7 +84,7 @@ public class StartServer {
             return ProfGUI.registerPage(true);
         });
 
-        //Print the login page
+        //Print the login page (for the profs)
         get("/login", (req, res) -> {
             String token = req.cookie("user");
             if (token == null) {
@@ -98,62 +98,64 @@ public class StartServer {
             return ProfGUI.loginPage(true);
         });
 
-        //Handle post request from 1st form to add a student & 2nd form to add a gommette
-        post("/users", (req, res) -> {
+        //Create a student
+        post("/protected/users", (req, res) -> {
 
-            String firstname, lastname, group, gommette, description, studentID;
+            String firstname, lastname, group;
             req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
-
-            // on recup les infos du 1er formulaire
+            // on recup les infos du formulaire
             firstname = req.queryParams("firstname");
             lastname = req.queryParams("lastname");
             group = req.queryParams("group");
 
-            // on recup les infos du 2eme formulaire
-            gommette = req.queryParams("gommette");
-            description = req.queryParams("description");
-            studentID = req.queryParams("studentName");
-
             String token = req.cookie("user");
-            int id_prof = -1;
+
             if (token == null) {
                 halt(401);
             }
             try {
-                id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
+                doLogin.introspec(token);
             } catch (Exception e) {
                 halt(401);
             }
 
             res.redirect("/users");
 
-            // en fonction du formulaire remplit, on appelle la bonne fonction
-            if (firstname != null && lastname != null && group != null){
-                return StudentGUI.create(firstname, lastname, group);
-            } else if (gommette != null && description != null && studentID != null){
-                return StudentGUI.addGommette(gommette, description, studentID, id_prof);
-            } else {
-                return null;
-            }
+            return StudentGUI.create(firstname, lastname, group);
         });
 
-        //Call create() to handle registration from form
+        //Register a prof
         post("/register", (req, res) -> {
 
             String firstname, lastname, username, newPassword;
             req.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
 
-            // try?
             firstname = req.queryParams("firstname");
             lastname = req.queryParams("lastname");
             username = req.queryParams("username");
             newPassword = req.queryParams("password");
 
-            return ProfGUI.create(firstname, lastname, username, newPassword);
+            try {
+                ProfGUI.create(firstname, lastname, username, newPassword);
+            } catch (Exception e) {
+                e.printStackTrace();
+                halt(500);
+            }
+
+            ArrayList<String> tokenAndPage = ProfGUI.login(username, newPassword);
+            if (tokenAndPage == null) {
+                return "User does not exists.";
+            }
+            try {
+                res.cookie("user", tokenAndPage.get(0));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            return tokenAndPage.get(1);
         });
 
-        //Call login(), also passes 'response' to be able to write a cookie
+        //Login prof
         post("/login", (req, res) -> {
 
             String username, newPassword;
@@ -175,7 +177,7 @@ public class StartServer {
         });
 
         //Add a gommette to a user
-        put("/users", (req, res) -> {
+        put("/protected/users", (req, res) -> {
 
             Gommette gomTmp = null;
             ObjectMapper mapper = new ObjectMapper();
@@ -204,7 +206,7 @@ public class StartServer {
         });
 
         //Modify a specific gommette
-        put("/users/:id", (req, res) -> {
+        put("/protected/users/:id", (req, res) -> {
 
             Gommette gomTmp = null;
             ObjectMapper mapper = new ObjectMapper();
@@ -222,17 +224,20 @@ public class StartServer {
             return StudentGUI.modifyGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()));
         });
 
-        delete("/users/:id/delete", (req, res) -> {
+        //Delete a specific student
+        delete("/protected/users/:id/delete", (req, res) -> {
             String id = req.params(":id");
             return StudentGUI.delete(id);
         });
 
-        delete("/gommette/:id/delete", (req, res) -> {
+        //Delete a gommette from a student
+        delete("/protected/gommette/:id/delete", (req, res) -> {
             String id = req.params(":id");
             return StudentGUI.deleteGommette(id);
         });
 
-        delete("/prof/:id/delete", (req, res) -> {
+        //Delete a prof
+        delete("/protected/prof/:id/delete", (req, res) -> {
             String id_to_del = req.params(":id");
 
             String id_prof = "";

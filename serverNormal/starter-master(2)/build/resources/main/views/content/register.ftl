@@ -11,7 +11,7 @@
 <h1>Professors :</h1>
 <ul>
     <#list users as user>
-        <li>${user.id} - ${user.firstName} ${user.lastName} aka ${user.username} <#if logged== true><button data-prof-id="http://localhost:8081/prof/${user.id}/delete" id="delete-prof">Delete</button></#if></li>
+        <li>${user.id} - ${user.firstName} ${user.lastName} aka ${user.username} <#if logged== true><button data-prof-id="http://localhost:8081/protected/prof/${user.id}/delete" id="delete-prof">Delete</button></#if></li>
     </#list>
 </ul>
 <h1>Registration :</h1>
