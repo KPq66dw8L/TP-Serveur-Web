@@ -128,17 +128,6 @@ public class StartServer {
             lastname = req.queryParams("lastname");
             group = req.queryParams("group");
 
-            String token = req.cookie("user");
-
-            if (token == null) {
-                halt(401);
-            }
-            try {
-                doLogin.introspec(token);
-            } catch (Exception e) {
-                halt(401);
-            }
-
             res.redirect("/users");
 
             return StudentGUI.create(firstname, lastname, group);
@@ -210,16 +199,7 @@ public class StartServer {
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
-//            int id_prof = -1;
-//            String token = req.cookie("user");
-//            if (token == null) {
-//                halt(401);
-//            }
-//            try {
-//                id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
-//            } catch (Exception e) {
-//                halt(401);
-//            }
+
             String token = req.cookie("user");
             int id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
 
@@ -261,16 +241,6 @@ public class StartServer {
         delete("/protected/prof/:id/delete", (req, res) -> {
             String id_to_del = req.params(":id");
 
-//            String id_prof = "";
-//            String token = req.cookie("user");
-//            if (token == null) {
-//                halt(401);
-//            }
-//            try {
-//                id_prof = Objects.requireNonNull(doLogin.introspec(token)).get("uuid");
-//            } catch (Exception e) {
-//                halt(401);
-//            }
             String token = req.cookie("user");
             String id_prof = Objects.requireNonNull(doLogin.introspec(token)).get("uuid");
 
