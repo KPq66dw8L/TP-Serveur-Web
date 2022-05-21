@@ -6,6 +6,7 @@ import com.uca.entity.Gommette;
 import com.uca.gui.ProfGUI;
 import com.uca.gui.StudentGUI;
 import com.uca.security.doLogin;
+import io.jsonwebtoken.ExpiredJwtException;
 
 import javax.servlet.MultipartConfigElement;
 import java.util.ArrayList;
@@ -28,6 +29,24 @@ public class StartServer {
         * Router, defining our routes
         * ***
         **/
+
+        before("/protected/*", (request, response) -> {
+            String token = request.cookie("user");
+
+            if (!request.requestMethod().equals("OPTIONS")) {
+                try {
+                    if (doLogin.introspec(token) == null) {
+                        halt(401, "You are not welcome here.");
+                    } else {
+                        System.out.println("Access authorized.");
+                    }
+                } catch (ExpiredJwtException e) {
+                    halt(400, "Token expired.");
+                } catch (Exception e) {
+                    halt(401, "You are not welcome here.");
+                }
+            }
+        });
 
         //Redirect to "/users"
         get("/", (req, res) -> {
@@ -53,7 +72,7 @@ public class StartServer {
             return StudentGUI.getAllUsers(true);
         });
 
-        //Get a precise student page, listing its gommettes and associated descriptions
+        //Get a precise student's page, listing its gommettes and associated descriptions
         get("/users/:id", (req, res) -> {
             String id = req.params(":id");
 
@@ -191,16 +210,18 @@ public class StartServer {
             } catch ( Exception e ) {
                 e.printStackTrace();
             }
-            int id_prof = -1;
+//            int id_prof = -1;
+//            String token = req.cookie("user");
+//            if (token == null) {
+//                halt(401);
+//            }
+//            try {
+//                id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
+//            } catch (Exception e) {
+//                halt(401);
+//            }
             String token = req.cookie("user");
-            if (token == null) {
-                halt(401);
-            }
-            try {
-                id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
-            } catch (Exception e) {
-                halt(401);
-            }
+            int id_prof = Integer.parseInt(Objects.requireNonNull(doLogin.introspec(token)).get("uuid"));
 
             return StudentGUI.addGommette(gomTmp.getColour(), gomTmp.getDescription(), String.valueOf(gomTmp.getId()), id_prof);
         });
@@ -240,16 +261,19 @@ public class StartServer {
         delete("/protected/prof/:id/delete", (req, res) -> {
             String id_to_del = req.params(":id");
 
-            String id_prof = "";
+//            String id_prof = "";
+//            String token = req.cookie("user");
+//            if (token == null) {
+//                halt(401);
+//            }
+//            try {
+//                id_prof = Objects.requireNonNull(doLogin.introspec(token)).get("uuid");
+//            } catch (Exception e) {
+//                halt(401);
+//            }
             String token = req.cookie("user");
-            if (token == null) {
-                halt(401);
-            }
-            try {
-                id_prof = Objects.requireNonNull(doLogin.introspec(token)).get("uuid");
-            } catch (Exception e) {
-                halt(401);
-            }
+            String id_prof = Objects.requireNonNull(doLogin.introspec(token)).get("uuid");
+
             return ProfGUI.delete(id_prof, id_to_del);
         });
     }
