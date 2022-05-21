@@ -15,11 +15,6 @@ public abstract class _Generic<T> {
      */
     public abstract T create(T obj) throws SQLException;
 
-    /**
-     * Permet la suppression d'une entrée de la base
-     * @param id
-     * @param gommettes_id
-     */
-    public abstract void delete(int id, ArrayList<Integer> gommettes_id) throws SQLException;
+
 
 }

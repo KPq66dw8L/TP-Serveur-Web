@@ -60,18 +60,38 @@ public class ProfDAO extends _Generic<ProfEntity> {
         return null;
     }
 
-    @Override
-    public void delete(int id, ArrayList<Integer> gommettes_id) throws SQLException {
-    // TODO
-    }
-
     public boolean deleteProf(int id) {
         try {
+
             PreparedStatement statement;
+            statement = this.connect.prepareStatement("SELECT id_gommette FROM givenGommettes WHERE id_prof=?;");
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            ArrayList<Integer> id_gommettes = new ArrayList<>();
+            // Even though the request only returns one result, we need the following while loop
+            while (resultSet.next()){
+                try {
+                    id_gommettes.add(resultSet.getInt(1));
+                } catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
+
+            statement = this.connect.prepareStatement("DELETE FROM givenGommettes WHERE id_prof=?");
+            statement.setInt(1, id);
+            statement.executeUpdate();
+
+            for (int tmp : id_gommettes){
+                statement = this.connect.prepareStatement("DELETE FROM gommettes WHERE id=?");
+                statement.setInt(1, tmp);
+                statement.executeUpdate();
+            }
+
             statement = this.connect.prepareStatement("DELETE FROM profs WHERE id=?");
             statement.setInt(1, id);
             statement.executeUpdate();
             return true;
+
         } catch (SQLException e){
             e.printStackTrace();
         }

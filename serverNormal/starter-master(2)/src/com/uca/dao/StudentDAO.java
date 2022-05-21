@@ -102,11 +102,10 @@ public class StudentDAO extends _Generic<StudentEntity> {
         return null;
     }
 
-    @Override
     public void delete(int idStudent, ArrayList<Integer> gommettes_id) throws SQLException {
         try {
             PreparedStatement statement;
-            statement = this.connect.prepareStatement("DELETE FROM givenGommettes WHERE id_student=?"); // ou CASCADE?
+            statement = this.connect.prepareStatement("DELETE FROM givenGommettes WHERE id_student=?");
             statement.setInt(1, idStudent);
             statement.executeUpdate();
 
